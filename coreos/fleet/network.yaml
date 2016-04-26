@@ -1,0 +1,92 @@
+heat_template_version: 2014-10-16
+
+description: >
+  Setting up a private Network with an snat-router
+
+parameters:
+  public_net_id:
+    type: string
+    description: ID of public network for which floating IP addresses will be allocated
+  security_group_name:
+    type: string
+    description: Name of the security group
+  network_name:
+    type: string
+    default: coreos-network
+    description: Name of the internally used Network. Default coreos-network.
+  subnet_name:
+    type: string
+    default: coreos-subnet
+    description: Name of the internally used Subnet. Default coreos-subnet.
+
+resources:
+
+  ### Creates a Neutron network and subnet
+  network:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: network_name }
+
+  subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      name: { get_param: subnet_name }
+      dns_nameservers:
+        - 37.123.105.116
+        - 37.123.105.117
+      network_id: { get_resource: network }
+      ip_version: 4
+      gateway_ip: 10.0.1.1
+      cidr: 10.0.1.0/24
+      allocation_pools:
+        - { start: 10.0.1.10, end: 10.0.1.240 }
+
+  router:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info: { network: { get_param: public_net_id }, enable_snat: true }
+
+  router_subnet_connect:
+    type: OS::Neutron::RouterInterface
+    depends_on: [ subnet, router ]
+    properties: 
+      router_id: { get_resource: router }
+      subnet: { get_resource: subnet }
+
+  security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: SecurityGroup with ssh and icmp
+      name: { get_param: security_group_name }
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 80
+          port_range_max: 80
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 443
+          port_range_max: 443
+
+outputs:
+  network:
+    description: Created Network
+    value: { get_attr: [network, show] }
+  subnet:
+    description: Created Subnet
+    value: { get_attr: [subnet, show] }
+  router:
+    description: Created Router
+    value: { get_attr: [router, show] }
+  router_subnet_connect:
+    description: Created Router to Subnet connection
+    value: { get_resource: router_subnet_connect }
+  security_group:
+    description: Created SecurityGroup
+    value: { get_resource: security_group }

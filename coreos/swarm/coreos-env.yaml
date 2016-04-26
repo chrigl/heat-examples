@@ -1,0 +1,8 @@
+parameters:
+  key_name: cglaubitz
+  public_net_id: 4c23774c-395b-49d0-b8e1-347e886fa9bf
+  image: CoreOS Stable
+  flavor: m1.micro
+  front_image: CoreOS Stable
+  front_flavor: m1.micro
+  coreos_reboot_strategy: "off"
