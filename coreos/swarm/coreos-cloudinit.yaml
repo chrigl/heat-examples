@@ -105,11 +105,11 @@ coreos:
       content: |
         [Unit]
         Description=Starting docker swarm manage
-        After=docker.service hack-dynip.service
+        After=etcd2.service docker.service hack-dynip.service
         Requies=etcd2.service docker.service hack-dynip.service
         [Service]
         EnvironmentFile=/etc/environment
         ExecStartPre=-/usr/bin/docker kill swarm-manage
         ExecStartPre=-/usr/bin/docker rm swarm-manage
-        ExecStart=/usr/bin/docker run --rm -p 5376:5376 --name swarm-manage swarm manage -H 0.0.0.0:5376 etcd://${COREOS_PRIVATE_IPV4}:2379
+        ExecStart=/usr/bin/docker run --rm -p 5376:5376 --name swarm-manage swarm manage -H 0.0.0.0:5376 --replication --advertise=${COREOS_PRIVATE_IPV4}:5367 etcd://${COREOS_PRIVATE_IPV4}:2379
         ExecStop=/usr/bin/docker stop swarm-manage

@@ -5,4 +5,5 @@ parameters:
   flavor: m1.micro
   front_image: CoreOS Stable
   front_flavor: m1.micro
+  front_count: 2
   coreos_reboot_strategy: "off"
