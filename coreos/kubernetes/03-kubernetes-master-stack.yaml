@@ -1,0 +1,50 @@
+heat_template_version: 2014-10-16
+
+description: >
+  kubernetes master
+
+parameters:
+  network:
+    type: string
+    description: Network to connect to. NO default value.
+  subnet:
+    type: string
+    description: Subnet to connect to. NO default value.
+  key_name:
+    type: string
+    description: Name of keypair to assign to servers
+  image:
+    type: string
+    description: Name of image to use for servers
+    default: CoreOS Stable
+  flavor:
+    type: string
+    default: m1.micro
+    description: Flavor to use for nodes
+  coreos_reboot_strategy:
+    type: string
+    default: "off"
+    description: Enable or disable reboot for update (best-effort|etcd-lock|reboot|off). Default off.
+
+resources:
+
+  # just using a ResourceGroup to be able to "include" the file
+  kubernetes_master:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 1
+      resource_def:
+        type: kubernetes/master-node.yaml
+        properties:
+          server_name: kubernetes-master
+          network: { get_param: network }
+          subnet: { get_param: subnet }
+          image: { get_param: image }
+          flavor: { get_param: flavor }
+          key_name: { get_param: key_name }
+          coreos_reboot_strategy: { get_param: coreos_reboot_strategy }
+
+outputs:
+  servers:
+    description: Resulted servers
+    value: { get_attr: [kubernetes_master, show] }

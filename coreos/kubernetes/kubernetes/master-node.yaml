@@ -1,0 +1,77 @@
+heat_template_version: 2014-10-16
+
+description: >
+  etcd node
+
+parameters:
+  network:
+    type: string
+    description: Network to connect to. NO default value.
+  subnet:
+    type: string
+    description: Subnet to connect to. NO default value.
+  key_name:
+    type: string
+    description: Name of keypair to assign to servers
+  image:
+    type: string
+    description: Name of image to use for servers
+  fixed_ip:
+    type: string
+    description: Fixed ip of kubernetes-master
+    default: 10.0.0.2
+  server_name:
+    type: string
+    default: kubernetes-master
+    description: Name of the resulting server
+  flavor:
+    type: string
+    default: m1.micro
+    description: Flavor to use for nodes
+  security_groups:
+    type: comma_delimited_list
+    description: Security groups for jump host
+    default: default
+  coreos_reboot_strategy:
+    type: string
+    default: "off"
+    description: Enable or disable reboot for update (best-effort|etcd-lock|reboot|off). Default off.
+
+resources:
+
+  kubernetes_master:
+    type: OS::Nova::Server
+    properties:
+      config_drive: True # coreos may need this https://coreos.com/docs/running-coreos/platforms/openstack/
+      name: { get_param: server_name }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      networks:
+        - port: { get_resource: kubernetes_master_port }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: { get_file: master-cloudinit.yaml }
+          params:
+            $reboot_strategy: { get_param: coreos_reboot_strategy }
+            $master_ca: { get_file: ../tls/ca.pem }
+            $apiserver: { get_file: ../tls/apiserver.pem }
+            $apiserver_key: { get_file: ../tls/apiserver-key.pem }
+
+  kubernetes_master_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network }
+      security_groups: { get_param: security_groups }
+      fixed_ips:
+        - subnet_id: { get_param: subnet }
+          ip_address: { get_param: fixed_ip }
+
+outputs:
+  server:
+    description: Resulted server
+    value: { get_attr: [kubernetes_master, show] }
+  port:
+    description: Network port of the resulted server
+    value: { get_attr: [kubernetes_master_port, show] }

@@ -1,0 +1,17 @@
+{
+	"/etc/kubernetes/ssl/ca.pem": {
+		"src": "../tls/ca.pem",
+		"owner": "root",
+		"mode": "0600"
+	},
+	"/etc/kubernetes/ssl/apiserver.pem": {
+		"src": "../tls/apiserver.pem",
+		"owner": "root",
+		"mode": "0600"
+	},
+	"/etc/kubernetes/ssl/apiserver-key.pem": {
+		"src": "../tls/apiserver-key.pem",
+		"owner": "root",
+		"mode": "0600"
+	}
+}
