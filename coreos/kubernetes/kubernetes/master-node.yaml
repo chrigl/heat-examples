@@ -16,6 +16,12 @@ parameters:
   image:
     type: string
     description: Name of image to use for servers
+  etcd_endpoints:
+    type: string
+    description: Comma separated list of etcd server http://10.0.0.16:2389,
+  hyperkube_version:
+    type: string
+    description: hyperkube version see https://quay.io/repository/coreos/hyperkube?tab=tags
   fixed_ip:
     type: string
     description: Fixed ip of kubernetes-master
@@ -58,6 +64,9 @@ resources:
             $master_ca: { get_file: ../tls/ca.pem }
             $apiserver: { get_file: ../tls/apiserver.pem }
             $apiserver_key: { get_file: ../tls/apiserver-key.pem }
+            $advertise_ip: { get_param: fixed_ip }
+            $etcd_endpoints: { get_param: etcd_endpoints }
+            $hyperkube_version: { get_param: hyperkube_version }
 
   kubernetes_master_port:
     type: OS::Neutron::Port

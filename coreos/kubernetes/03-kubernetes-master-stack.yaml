@@ -13,6 +13,12 @@ parameters:
   key_name:
     type: string
     description: Name of keypair to assign to servers
+  etcd_endpoints:
+    type: string
+    description: Comma separated list of etcd server http://10.0.0.16:2389,
+  hyperkube_version:
+    type: string
+    description: hyperkube version see https://quay.io/repository/coreos/hyperkube?tab=tags
   image:
     type: string
     description: Name of image to use for servers
@@ -43,6 +49,8 @@ resources:
           flavor: { get_param: flavor }
           key_name: { get_param: key_name }
           coreos_reboot_strategy: { get_param: coreos_reboot_strategy }
+          etcd_endpoints: { get_param: etcd_endpoints }
+          hyperkube_version: { get_param: hyperkube_version }
 
 outputs:
   servers:

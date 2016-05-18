@@ -1,0 +1,4 @@
+on some etcd node, on a new setup:
+etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
+
+apiserver does not start for an unknown reason :(
