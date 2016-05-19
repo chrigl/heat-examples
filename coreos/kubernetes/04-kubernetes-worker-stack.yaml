@@ -1,7 +1,7 @@
 heat_template_version: 2014-10-16
 
 description: >
-  kubernetes master
+  kubernetes worker
 
 parameters:
   network:
@@ -35,14 +35,18 @@ parameters:
 resources:
 
   # just using a ResourceGroup to be able to "include" the file
-  kubernetes_master:
+  kubernetes_worker:
     type: OS::Heat::ResourceGroup
     properties:
       count: 1
       resource_def:
-        type: kubernetes/master/node.yaml
+        type: kubernetes/worker/node.yaml
         properties:
-          server_name: kubernetes-master
+          server_name:
+            list_join:
+              - '-'
+              - - { get_param: 'OS::stack_name' }
+                - kubernetes-worker
           network: { get_param: network }
           subnet: { get_param: subnet }
           image: { get_param: image }
@@ -55,4 +59,4 @@ resources:
 outputs:
   servers:
     description: Resulted servers
-    value: { get_attr: [kubernetes_master, show] }
+    value: { get_attr: [kubernetes_worker, show] }

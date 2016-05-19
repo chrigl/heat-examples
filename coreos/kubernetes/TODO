@@ -1,4 +1,19 @@
 on some etcd node, on a new setup:
 etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
 
-apiserver does not start for an unknown reason :(
+setting up kubectl(?)
+
+cluster-ip... whats that? configured by me, is not valid
+core@kubernetes-master ~ $ kubectl get services
+NAME         CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+kubernetes   10.254.254.1   <none>        443/TCP   1h
+
+worker should be a "countable" resource. with dhcp.
+within worker, $advertise_ip should be COREOS_PRIVATE_IPV4, which must be created by the(tm) hack.
+
+front-/back-nodes:
+To be able to schedule stuff to external reachable nodes
+
+missing
+* dns
+* calico (… do not need(?))

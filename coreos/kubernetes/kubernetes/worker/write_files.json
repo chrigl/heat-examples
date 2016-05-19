@@ -1,0 +1,27 @@
+{
+	"/etc/kubernetes/ssl/ca.pem": {
+		"src": "../tls/ca.pem",
+		"owner": "root",
+		"mode": "0600"
+	},
+	"/etc/kubernetes/ssl/worker.pem": {
+		"src": "../tls/worker.pem",
+		"owner": "root",
+		"mode": "0600"
+	},
+	"/etc/kubernetes/ssl/worker-key.pem": {
+		"src": "../tls/worker-key.pem",
+		"owner": "root",
+		"mode": "0600"
+	},
+	"/etc/kubernetes/manifests/kube-proxy.yaml": {
+		"src": "worker/manifests/kube-proxy.yaml",
+		"owner": "root",
+		"mode": "0600"
+	},
+	"/etc/kubernetes/worker-kubeconfig.yaml": {
+		"src": "worker/worker-kubeconfig.yaml",
+		"owner": "root",
+		"mode": "0600"
+	}
+}

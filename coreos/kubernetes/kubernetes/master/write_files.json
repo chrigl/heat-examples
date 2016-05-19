@@ -15,22 +15,22 @@
 		"mode": "0600"
 	},
 	"/etc/kubernetes/manifests/kube-apiserver.yaml": {
-		"src": "manifests/kube-apiserver.yaml",
+		"src": "master/manifests/kube-apiserver.yaml",
 		"owner": "root",
 		"mode": "0600"
 	},
 	"/etc/kubernetes/manifests/kube-proxy.yaml": {
-		"src": "manifests/kube-proxy.yaml",
+		"src": "master/manifests/kube-proxy.yaml",
 		"owner": "root",
 		"mode": "0600"
 	},
 	"/etc/kubernetes/manifests/kube-controller-manager.yaml": {
-		"src": "manifests/kube-controller-manager.yaml",
+		"src": "master/manifests/kube-controller-manager.yaml",
 		"owner": "root",
 		"mode": "0600"
 	},
 	"/etc/kubernetes/manifests/kube-scheduler.yaml": {
-		"src": "manifests/kube-scheduler.yaml",
+		"src": "master/manifests/kube-scheduler.yaml",
 		"owner": "root",
 		"mode": "0600"
 	}
