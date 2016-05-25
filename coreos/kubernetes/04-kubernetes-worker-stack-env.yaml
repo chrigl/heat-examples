@@ -2,4 +2,4 @@ parameters:
   key_name: cglaubitz
   image: "CoreOS Alpha"
   hyperkube_version: "v1.2.4_coreos.1"
-  etcd_endpoints: "http://10.0.0.16:2379,http://10.0.0.17:2379,http://10.0.0.18:2379,http://10.0.0.19:2379,http://10.0.0.20:2379"
+  etcd_endpoints: "http://10.0.0.11:2379,http://10.0.0.12:2379,http://10.0.0.13:2379,http://10.0.0.14:2379,http://10.0.0.15:2379"

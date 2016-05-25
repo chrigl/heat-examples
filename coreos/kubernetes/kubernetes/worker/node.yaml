@@ -7,9 +7,6 @@ parameters:
   network:
     type: string
     description: Network to connect to. NO default value.
-  subnet:
-    type: string
-    description: Subnet to connect to. NO default value.
   key_name:
     type: string
     description: Name of keypair to assign to servers
@@ -22,10 +19,6 @@ parameters:
   hyperkube_version:
     type: string
     description: hyperkube version see https://quay.io/repository/coreos/hyperkube?tab=tags
-  fixed_ip:
-    type: string
-    description: Fixed ip of kubernetes-master
-    default: 10.0.0.4
   server_name:
     type: string
     default: kubernetes-worker
@@ -48,7 +41,7 @@ resources:
   kubernetes_worker:
     type: OS::Nova::Server
     properties:
-      config_drive: True # coreos may need this https://coreos.com/docs/running-coreos/platforms/openstack/
+      config_drive: False
       name: { get_param: server_name }
       flavor: { get_param: flavor }
       image: { get_param: image }
@@ -61,9 +54,9 @@ resources:
           template: { get_file: cloudinit.yaml }
           params:
             $reboot_strategy: { get_param: coreos_reboot_strategy }
-            $advertise_ip: { get_param: fixed_ip }
             $etcd_endpoints: { get_param: etcd_endpoints }
             $hyperkube_version: { get_param: hyperkube_version }
+            $flanneld_iface: eth0
 
   kubernetes_worker_port:
     type: OS::Neutron::Port

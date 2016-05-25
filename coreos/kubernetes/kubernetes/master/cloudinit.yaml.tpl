@@ -1,6 +1,11 @@
 #cloud-config
 
 write_files:
+  - path: /etc/environment-kubelet
+    permissions: 0600
+    owner: root
+    content: |
+      KUBELET_VERSION=$hyperkube_version
   - path: /etc/flannel/options.env
     permission: 0600
     owner: root
@@ -31,16 +36,18 @@ coreos:
       content : |
         [Service]
         ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
-
-        Environment=KUBELET_VERSION=v1.2.4_coreos.cni.1
+        EnvironmentFile=/etc/environment
+        EnvironmentFile=/etc/environment-kubelet
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --api-servers=http://127.0.0.1:8080 \
           --network-plugin-dir=/etc/kubernetes/cni/net.d \
           --register-schedulable=false \
           --allow-privileged=true \
           --config=/etc/kubernetes/manifests \
-          --hostname-override=10.0.0.2
+          --hostname-override=${COREOS_PRIVATE_IPV4}
         Restart=always
         RestartSec=10
         [Install]
         WantedBy=multi-user.target 
+      command: start
+      enable: true

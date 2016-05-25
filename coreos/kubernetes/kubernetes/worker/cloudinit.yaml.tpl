@@ -1,11 +1,16 @@
 #cloud-config
 
 write_files:
-  - path: /etc/flannel/options.env
-    permission: 0600
+  - path: /etc/environment-kubelet
+    permissions: 0600
     owner: root
     content: |
-      FLANNELD_IFACE=$advertise_ip
+      KUBELET_VERSION=$hyperkube_version
+  - path: /etc/flannel/options.env
+    permissions: 0600
+    owner: root
+    content: |
+      FLANNELD_IFACE=$flanneld_iface
       FLANNELD_ETCD_ENDPOINTS=$etcd_endpoints
 
 coreos:
@@ -31,15 +36,15 @@ coreos:
       content : |
         [Service]
         ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
-
-        Environment=KUBELET_VERSION=v1.2.4_coreos.cni.1
+        EnvironmentFile=/etc/environment
+        EnvironmentFile=/etc/environment-kubelet
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --api-servers=https://10.0.0.2 \
           --network-plugin-dir=/etc/kubernetes/cni/net.d \
           --register-node=true \
           --allow-privileged=true \
           --config=/etc/kubernetes/manifests \
-          --hostname-override=$advertise_ip \
+          --hostname-override=${COREOS_PRIVATE_IPV4} \
           --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
           --tls-cert-file=/etc/kubernetes/ssl/worker.pem \
           --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem
@@ -47,3 +52,5 @@ coreos:
         RestartSec=10
         [Install]
         WantedBy=multi-user.target
+      command: start
+      enable: true

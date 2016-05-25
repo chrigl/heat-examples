@@ -1,19 +1,39 @@
-on some etcd node, on a new setup:
+# on some etcd node, on a new setup:
 etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
 
-setting up kubectl(?)
+# setting up kubectl(? or External IP on master)
+https://coreos.com/kubernetes/docs/latest/configure-kubectl.html
 
-cluster-ip... whats that? configured by me, is not valid
+# cluster-ip... whats that? configured by me, is not valid
 core@kubernetes-master ~ $ kubectl get services
 NAME         CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
 kubernetes   10.254.254.1   <none>        443/TCP   1h
+             ^^^^^^^^^^^^(?)
 
-worker should be a "countable" resource. with dhcp.
-within worker, $advertise_ip should be COREOS_PRIVATE_IPV4, which must be created by the(tm) hack.
+# Create namespace "kube-system"
+ERROR: namespaces "kube-system" not foun
 
-front-/back-nodes:
-To be able to schedule stuff to external reachable nodes
+# External IP on master(?)
+To use kubectl from @home
 
-missing
-* dns
+# External IPs
+To be able to schedule stuff to external reachable nodes.
+Or to route stuff to external nodes to some pod.
+http://kubernetes.io/docs/user-guide/services/
+
+# Multi Master Setup
+
+service ip for internal communication
+
+# Per worker tls certs
+
+optional
+
+# Networking
+
+* split network to management network with etcd?
+* Hard coded ips for etcd, may result in duplication of OS::Nova::Server, instead of using a count on a resource group
+
+# missing
+* dns (https://coreos.com/kubernetes/docs/latest/deploy-addons.html)
 * calico (… do not need(?))

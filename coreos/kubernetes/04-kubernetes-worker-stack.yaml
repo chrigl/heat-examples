@@ -7,9 +7,6 @@ parameters:
   network:
     type: string
     description: Network to connect to. NO default value.
-  subnet:
-    type: string
-    description: Subnet to connect to. NO default value.
   key_name:
     type: string
     description: Name of keypair to assign to servers
@@ -19,6 +16,10 @@ parameters:
   hyperkube_version:
     type: string
     description: hyperkube version see https://quay.io/repository/coreos/hyperkube?tab=tags
+  count:
+    type: string
+    description: Number of kubernetes workers, default 2
+    default: 2
   image:
     type: string
     description: Name of image to use for servers
@@ -38,7 +39,7 @@ resources:
   kubernetes_worker:
     type: OS::Heat::ResourceGroup
     properties:
-      count: 1
+      count: { get_param: count }
       resource_def:
         type: kubernetes/worker/node.yaml
         properties:
@@ -46,9 +47,8 @@ resources:
             list_join:
               - '-'
               - - { get_param: 'OS::stack_name' }
-                - kubernetes-worker
+                - kubernetes-worker%index%
           network: { get_param: network }
-          subnet: { get_param: subnet }
           image: { get_param: image }
           flavor: { get_param: flavor }
           key_name: { get_param: key_name }
@@ -59,4 +59,4 @@ resources:
 outputs:
   servers:
     description: Resulted servers
-    value: { get_attr: [kubernetes_worker, show] }
+    value: { get_attr: [kubernetes_worker, value] }

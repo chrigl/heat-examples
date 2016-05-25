@@ -42,7 +42,11 @@ resources:
       resource_def:
         type: kubernetes/master/node.yaml
         properties:
-          server_name: kubernetes-master
+          server_name:
+            list_join:
+              - '-'
+              - - { get_param: 'OS::stack_name' }
+                - kubernetes-master%index%
           network: { get_param: network }
           subnet: { get_param: subnet }
           image: { get_param: image }

@@ -48,7 +48,7 @@ resources:
   kubernetes_master:
     type: OS::Nova::Server
     properties:
-      config_drive: True # coreos may need this https://coreos.com/docs/running-coreos/platforms/openstack/
+      config_drive: False
       name: { get_param: server_name }
       flavor: { get_param: flavor }
       image: { get_param: image }
