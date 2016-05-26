@@ -1,3 +1,7 @@
+# Heat: SecurityGroups !!!
+
+Otherwise nothing works
+
 # on some etcd node, on a new setup:
 etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
 
@@ -11,7 +15,9 @@ kubernetes   10.254.254.1   <none>        443/TCP   1h
              ^^^^^^^^^^^^(?)
 
 # Create namespace "kube-system"
-ERROR: namespaces "kube-system" not foun
+ERROR: namespaces "kube-system" not found
+http://kubernetes.io/docs/admin/namespaces/
+
 
 # External IP on master(?)
 To use kubectl from @home
