@@ -45,6 +45,119 @@ parameters:
 
 resources:
 
+  kubernetes_cloud_init:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        write_files:
+          - path: /etc/kubernetes/ssl/ca.pem
+            permissions: "0600"
+            owner: root
+            content: { get_file: ../../tls/ca.pem }
+          - path: /etc/kubernetes/ssl/apiserver.pem
+            permissions: "0600"
+            owner: root
+            content: { get_file: ../../tls/apiserver.pem }
+          - path: /etc/kubernetes/ssl/apiserver-key.pem
+            permissions: "0600"
+            owner: root
+            content: { get_file: ../../tls/apiserver-key.pem }
+          - path: /etc/kubernetes/manifests/kube-proxy.yaml
+            permissions: "0600"
+            owner: root
+            content:
+              str_replace:
+                template: { get_file: manifests/kube-proxy.yaml }
+                params:
+                  $hyperkube_version: { get_param: hyperkube_version }
+          - path: /etc/kubernetes/manifests/kube-controller-manager.yaml
+            permissions: "0600"
+            owner: root
+            content:
+              str_replace:
+                template: { get_file: manifests/kube-controller-manager.yaml }
+                params:
+                  $hyperkube_version: { get_param: hyperkube_version }
+          - path: /etc/kubernetes/manifests/kube-apiserver.yaml
+            permissions: "0600"
+            owner: root
+            content:
+              str_replace:
+                template: { get_file: manifests/kube-apiserver.yaml }
+                params:
+                  $hyperkube_version: { get_param: hyperkube_version }
+                  $etcd_endpoints: { get_param: etcd_endpoints }
+                  $advertise_ip: { get_param: fixed_ip }
+          - path: /etc/kubernetes/manifests/kube-scheduler.yaml
+            permissions: "0600"
+            owner: root
+            content:
+              str_replace:
+                template: { get_file: manifests/kube-scheduler.yaml }
+                params:
+                  $hyperkube_version: { get_param: hyperkube_version }
+          - path: /etc/environment-kubelet
+            permissions: "0600"
+            owner: root
+            content:
+              list_join:
+                - '='
+                - - "KUBELET_VERSION"
+                  - { get_param: hyperkube_version }
+          - path: /etc/flannel/options.env
+            permission: "0600"
+            owner: root
+            content:
+              list_join:
+                - "\n"
+                - - list_join:
+                      - "="
+                      - - "FLANNELD_IFACE"
+                        - { get_param: fixed_ip }
+                  - list_join:
+                      - "="
+                      - - "FLANNELD_ETCD_ENDPOINTS"
+                        - { get_param: etcd_endpoints }
+
+        coreos:
+          update:
+            reboot-strategy: { get_param: coreos_reboot_strategy }
+          units:
+            - name: flanneld.service
+              drop-ins:
+                - name: 40-ExecStartPre-symlink.conf
+                  content: |
+                    [Service]
+                    ExecStartPre=/usr/bin/ln -sf /etc/flannel/options.env /run/flannel/options.env
+              command: start
+            - name: docker.service
+              drop-ins:
+                - name: 40-flannel.conf
+                  content: |
+                    [Unit]
+                    Requires=flanneld.service
+                    After=flanneld.service
+              command: start
+            - name: kubelet.service
+              content : |
+                [Service]
+                ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
+                EnvironmentFile=/etc/environment
+                EnvironmentFile=/etc/environment-kubelet
+                ExecStart=/usr/lib/coreos/kubelet-wrapper \
+                  --api-servers=http://127.0.0.1:8080 \
+                  --network-plugin-dir=/etc/kubernetes/cni/net.d \
+                  --register-schedulable=false \
+                  --allow-privileged=true \
+                  --config=/etc/kubernetes/manifests \
+                  --hostname-override=${COREOS_PRIVATE_IPV4}
+                Restart=always
+                RestartSec=10
+                [Install]
+                WantedBy=multi-user.target 
+              command: start
+              enable: true
+
   kubernetes_master:
     type: OS::Nova::Server
     properties:
@@ -56,14 +169,7 @@ resources:
       networks:
         - port: { get_resource: kubernetes_master_port }
       user_data_format: RAW
-      user_data:
-        str_replace:
-          template: { get_file: cloudinit.yaml }
-          params:
-            $reboot_strategy: { get_param: coreos_reboot_strategy }
-            $advertise_ip: { get_param: fixed_ip }
-            $etcd_endpoints: { get_param: etcd_endpoints }
-            $hyperkube_version: { get_param: hyperkube_version }
+      user_data: { get_resource: kubernetes_cloud_init }
 
   kubernetes_master_port:
     type: OS::Neutron::Port

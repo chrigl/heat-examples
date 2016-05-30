@@ -38,6 +38,100 @@ parameters:
 
 resources:
 
+  kubernetes_cloud_config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        write_files:
+          - path: /etc/kubernetes/ssl/ca.pem
+            permissions: "0600"
+            owner: root
+            content: { get_file: ../../tls/ca.pem }
+          - path: /etc/kubernetes/manifests/kube-proxy.yaml
+            permissions: "0600"
+            owner: root
+            content:
+              str_replace:
+                template: { get_file: manifests/kube-proxy.yaml }
+                params:
+                  $hyperkube_version: { get_param: hyperkube_version }
+          - path: /etc/kubernetes/ssl/worker.pem
+            permissions: "0600"
+            owner: root
+            content: { get_file: ../../tls/worker.pem }
+          - path: /etc/kubernetes/worker-kubeconfig.yaml
+            permissions: "0600"
+            owner: root
+            content: { get_file: worker-kubeconfig.yaml }
+          - path: /etc/kubernetes/ssl/worker-key.pem
+            permissions: "0600"
+            owner: root
+            content: { get_file: ../../tls/worker-key.pem }
+          - path: /etc/environment-kubelet
+            permissions: "0600"
+            owner: root
+            content:
+              list_join:
+                - '='
+                - - "KUBELET_VERSION"
+                  - { get_param: hyperkube_version }
+          - path: /etc/flannel/options.env
+            permission: "0600"
+            owner: root
+            content:
+              list_join:
+                - "\n"
+                - - list_join:
+                      - "="
+                      - - "FLANNELD_IFACE"
+                        - "eth0"
+                  - list_join:
+                      - "="
+                      - - "FLANNELD_ETCD_ENDPOINTS"
+                        - { get_param: etcd_endpoints }
+
+        coreos:
+          update:
+            reboot-strategy: { get_param: coreos_reboot_strategy }
+          units:
+            - name: flanneld.service
+              drop-ins:
+                - name: 40-ExecStartPre-symlink.conf
+                  content: |
+                    [Service]
+                    ExecStartPre=/usr/bin/ln -sf /etc/flannel/options.env /run/flannel/options.env
+              command: start
+            - name: docker.service
+              drop-ins:
+                - name: 40-flannel.conf
+                  content: |
+                    [Unit]
+                    Requires=flanneld.service
+                    After=flanneld.service
+              command: start
+            - name: kubelet.service
+              content : |
+                [Service]
+                ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
+                EnvironmentFile=/etc/environment
+                EnvironmentFile=/etc/environment-kubelet
+                ExecStart=/usr/lib/coreos/kubelet-wrapper \
+                  --api-servers=https://10.0.0.2 \
+                  --network-plugin-dir=/etc/kubernetes/cni/net.d \
+                  --register-node=true \
+                  --allow-privileged=true \
+                  --config=/etc/kubernetes/manifests \
+                  --hostname-override=${COREOS_PRIVATE_IPV4} \
+                  --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
+                  --tls-cert-file=/etc/kubernetes/ssl/worker.pem \
+                  --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem
+                Restart=always
+                RestartSec=10
+                [Install]
+                WantedBy=multi-user.target
+              command: start
+              enable: true
+
   kubernetes_worker:
     type: OS::Nova::Server
     properties:
@@ -49,14 +143,7 @@ resources:
       networks:
         - port: { get_resource: kubernetes_worker_port }
       user_data_format: RAW
-      user_data:
-        str_replace:
-          template: { get_file: cloudinit.yaml }
-          params:
-            $reboot_strategy: { get_param: coreos_reboot_strategy }
-            $etcd_endpoints: { get_param: etcd_endpoints }
-            $hyperkube_version: { get_param: hyperkube_version }
-            $flanneld_iface: eth0
+      user_data: { get_resource: kubernetes_cloud_config }
 
   kubernetes_worker_port:
     type: OS::Neutron::Port
