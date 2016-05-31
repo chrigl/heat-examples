@@ -35,6 +35,31 @@ parameters:
 
 resources:
 
+  kubernetes_worker_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: allow access to kubernetes woker
+      name:
+        list_join:
+          - '-'
+          - - { get_param: 'OS::stack_name' }
+            - kubernetes-worker
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 443
+          port_range_max: 443
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 30000
+          port_range_max: 32767
+
   # just using a ResourceGroup to be able to "include" the file
   kubernetes_worker:
     type: OS::Heat::ResourceGroup
@@ -55,8 +80,14 @@ resources:
           coreos_reboot_strategy: { get_param: coreos_reboot_strategy }
           etcd_endpoints: { get_param: etcd_endpoints }
           hyperkube_version: { get_param: hyperkube_version }
+          security_groups:
+            - default
+            - { get_resource: kubernetes_worker_security_group }
 
 outputs:
   servers:
     description: Resulted servers
-    value: { get_attr: [kubernetes_worker, value] }
+    value: { get_attr: [kubernetes_worker, server] }
+  ports:
+    description: Resultes ports
+    value: { get_attr: [kubernetes_worker, port] }

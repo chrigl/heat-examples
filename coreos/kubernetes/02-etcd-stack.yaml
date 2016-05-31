@@ -36,6 +36,23 @@ parameters:
 
 resources:
 
+  etcd_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: allow ssh to etcd
+      name:
+        list_join:
+          - '-'
+          - - { get_param: 'OS::stack_name' }
+            - etcd
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp
+
   etcd_servers:
     type: OS::Heat::ResourceGroup
     properties:
@@ -54,6 +71,9 @@ resources:
           key_name: { get_param: key_name }
           discovery_url: { get_param: discovery_url }
           coreos_reboot_strategy: { get_param: coreos_reboot_strategy }
+          security_groups:
+            - default
+            - { get_resource: etcd_security_group }
 
 outputs:
   servers:

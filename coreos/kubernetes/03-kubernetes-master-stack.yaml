@@ -10,6 +10,9 @@ parameters:
   subnet:
     type: string
     description: Subnet to connect to. NO default value.
+  floating_ip:
+    type: string
+    description: Id of the floating ip. NO default value.
   key_name:
     type: string
     description: Name of keypair to assign to servers
@@ -22,7 +25,6 @@ parameters:
   image:
     type: string
     description: Name of image to use for servers
-    default: CoreOS Stable
   flavor:
     type: string
     default: m1.micro
@@ -33,6 +35,27 @@ parameters:
     description: Enable or disable reboot for update (best-effort|etcd-lock|reboot|off). Default off.
 
 resources:
+
+  kubernetes_master_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: allow ssh and https to kubernetes master
+      name:
+        list_join:
+          - '-'
+          - - { get_param: 'OS::stack_name' }
+            - kubernetes-master
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 443
+          port_range_max: 443
 
   # just using a ResourceGroup to be able to "include" the file
   kubernetes_master:
@@ -49,14 +72,21 @@ resources:
                 - kubernetes-master%index%
           network: { get_param: network }
           subnet: { get_param: subnet }
+          floating_ip: { get_param: floating_ip }
           image: { get_param: image }
           flavor: { get_param: flavor }
           key_name: { get_param: key_name }
           coreos_reboot_strategy: { get_param: coreos_reboot_strategy }
           etcd_endpoints: { get_param: etcd_endpoints }
           hyperkube_version: { get_param: hyperkube_version }
+          security_groups:
+            - default
+            - { get_resource: kubernetes_master_security_group }
 
 outputs:
   servers:
     description: Resulted servers
-    value: { get_attr: [kubernetes_master, show] }
+    value: { get_attr: [kubernetes_master, server] }
+  ports:
+    description: Resulted ports
+    value: { get_attr: [kubernetes_master, port] }

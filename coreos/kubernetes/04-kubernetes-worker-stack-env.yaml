@@ -3,3 +3,4 @@ parameters:
   image: "CoreOS Beta"
   hyperkube_version: "v1.2.4_coreos.1"
   etcd_endpoints: "http://10.0.0.11:2379,http://10.0.0.12:2379,http://10.0.0.13:2379,http://10.0.0.14:2379,http://10.0.0.15:2379"
+  network: b9cf1ca4-b47d-429d-8157-5e35841edacb
