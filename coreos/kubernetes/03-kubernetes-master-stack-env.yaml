@@ -1,8 +1,8 @@
 parameters:
   key_name: cglaubitz
-  image: "CoreOS Beta"
+  image: "CoreOS Stable"
   hyperkube_version: "v1.2.4_coreos.1"
   etcd_endpoints: "http://10.0.0.11:2379,http://10.0.0.12:2379,http://10.0.0.13:2379,http://10.0.0.14:2379,http://10.0.0.15:2379"
-  network: b9cf1ca4-b47d-429d-8157-5e35841edacb
-  subnet: c9f11e78-76f7-4d5a-8e45-3c52b985a0d3
-  floating_ip: 9da0998a-96a7-49a3-9229-2a4829f72f45
+  network: d321c87e-ab69-4353-b718-3903aeb6489e
+  subnet: cc64e222-c1ee-4059-a518-4a3f65dec4b8
+  floating_ip: 4dc00499-92b1-4945-a86f-b1108bd2187e

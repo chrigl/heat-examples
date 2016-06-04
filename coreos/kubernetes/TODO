@@ -1,12 +1,18 @@
-# Heat: SecurityGroups !!!
-
-Otherwise nothing works
-
 # on some etcd node, on a new setup:
 etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
 
+Using vxlan does not include the flanneld to encapsulate the traffic, but the kernel will do. This may be a bit more performant.
+etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": { "Type": "vxlan" } }'
+
+host-gw is unfortunately not usable, because the underlying network in openstack, only routes traffic from known mac addresses.
+
 # setting up kubectl(? or External IP on master)
 https://coreos.com/kubernetes/docs/latest/configure-kubectl.html
+
+## Answer
+
+Exporting the api. So the setup can be on the users computer.
+The cert only includes the DNS name "kubernetes-master". So you have to add this, with the associated floating ip, into your /etc/hosts
 
 # cluster-ip... whats that? configured by me, is not valid
 core@kubernetes-master ~ $ kubectl get services
@@ -14,18 +20,35 @@ NAME         CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
 kubernetes   10.254.254.1   <none>        443/TCP   1h
              ^^^^^^^^^^^^(?)
 
+## Answer
+
+Exposed services are listening on this addresses.
+http://kubernetes.io/docs/user-guide/services/
+
+These are available from all nodes.
+
 # Create namespace "kube-system"
 ERROR: namespaces "kube-system" not found
 http://kubernetes.io/docs/admin/namespaces/
 
+## Answer
 
-# External IP on master(?)
-To use kubectl from @home
+Currently, this must be done by hand after the bootstrap.
+kubectl create namespace kube-system
+
+After a while, the kubernetes pods show up there.
+kubectl get pods --namespace kube-system
 
 # External IPs
 To be able to schedule stuff to external reachable nodes.
 Or to route stuff to external nodes to some pod.
 http://kubernetes.io/docs/user-guide/services/
+
+## Answer
+
+So far, the Sys11Stack (OpenStack) does not support LBaaS. This means, it is not possible to use External Load Balancer. The only way, I got "public" services, is the usage of "NodePort". With the drawback, that a custom port is diced. But the service is available over each public ip on this port.
+
+kubectl expose rc webserver-rc --port=30001 --target-port=80 --type=NodePort
 
 # Multi Master Setup
 
