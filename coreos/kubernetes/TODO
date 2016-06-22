@@ -27,6 +27,8 @@ http://kubernetes.io/docs/user-guide/services/
 
 These are available from all nodes.
 
+Changed to 10.3.0.0/24
+
 # Create namespace "kube-system"
 ERROR: namespaces "kube-system" not found
 http://kubernetes.io/docs/admin/namespaces/

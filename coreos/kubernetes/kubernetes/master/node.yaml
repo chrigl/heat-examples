@@ -108,7 +108,7 @@ resources:
                 - - "KUBELET_VERSION"
                   - { get_param: hyperkube_version }
           - path: /etc/flannel/options.env
-            permission: "0600"
+            permissions: "0600"
             owner: root
             content:
               list_join:
@@ -121,6 +121,17 @@ resources:
                       - "="
                       - - "FLANNELD_ETCD_ENDPOINTS"
                         - { get_param: etcd_endpoints }
+          - path: /etc/flannel/setup_etcd_config.sh
+            permissions: "0700"
+            owner: root
+            content: |
+              #!/usr/bin/env bash
+              source /etc/flannel/options.env
+
+              while ! etcdctl --endpoints $FLANNELD_ETCD_ENDPOINTS get /coreos.com/network/config; do
+                  etcdctl --endpoints $FLANNELD_ETCD_ENDPOINTS set /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": { "Type": "vxlan" } }'
+                  sleep 2
+              done
 
         coreos:
           update:
@@ -132,6 +143,10 @@ resources:
                   content: |
                     [Service]
                     ExecStartPre=/usr/bin/ln -sf /etc/flannel/options.env /run/flannel/options.env
+                - name: 41-configure-flanneld.conf
+                  content: |
+                    [Service]
+                    ExecStartPre=/etc/flannel/setup_etcd_config.sh
               command: start
             - name: docker.service
               drop-ins:
