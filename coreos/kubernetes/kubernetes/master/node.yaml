@@ -90,7 +90,6 @@ resources:
                 params:
                   $hyperkube_version: { get_param: hyperkube_version }
                   $etcd_endpoints: { get_param: etcd_endpoints }
-                  $advertise_ip: { get_param: fixed_ip }
           - path: /etc/kubernetes/manifests/kube-scheduler.yaml
             permissions: "0600"
             owner: root
