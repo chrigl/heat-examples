@@ -2,7 +2,7 @@
 
 Dependency: `make` and `openssl`
 
-First of all, you need to configure your public_net_id in `01-network-stack-env.yaml`, and setup the network.
+First of all, you need to configure your public_net_id in `01-network-stack-env.yaml`, and setup the network. Also replace the `key name` in all the `*-env.yml`-files, or use `-P key_name=YOUR_KEY` with `heat`.
 
 ```
 $ heat stack-create -f 01-network-stack.yaml -e 01-network-stack-env.yaml kubi
