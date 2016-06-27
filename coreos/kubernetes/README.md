@@ -2,7 +2,7 @@
 
 Dependency: `make` and `openssl`
 
-First of all you need to configure your public_net_id in `01-network-stack-env.yaml`, and setup the network.
+First of all, you need to configure your public_net_id in `01-network-stack-env.yaml`, and setup the network.
 
 ```
 $ heat stack-create -f 01-network-stack.yaml -e 01-network-stack-env.yaml kubi
@@ -17,7 +17,7 @@ $ heat stack-list
 Getting the network, subnet_id and floating_ip_id
 
 ```
-> heat resource-list kubi
+$ heat resource-list kubi
 +-----------------------+-------------------------------------------------------------------------------------+------------------------------+-----------------+----------------------+
 | resource_name         | physical_resource_id                                                                | resource_type                | resource_status | updated_time         |
 +-----------------------+-------------------------------------------------------------------------------------+------------------------------+-----------------+----------------------+
@@ -48,7 +48,7 @@ $ nova list
 +--------------------------------------+------------------------+--------+------------+-------------+-----------------------------------+
 ```
 
-Edit `03-kubernetes-master-stack-env.yaml` and `04-kubernetes-worker-stack-env.yml` in the same way as `02-etcd-stack-env.yaml`, but also adust the `etcd\_endpoints`.
+Edit `03-kubernetes-master-stack-env.yaml` and `04-kubernetes-worker-stack-env.yml` in the same way as `02-etcd-stack-env.yaml`, but also adjust the `etcd endpoints`.
 
 
 Now, you can create the necessary TLS CA and stuff, by calling `make`
