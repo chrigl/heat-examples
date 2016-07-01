@@ -44,7 +44,7 @@ resources:
   router:
     type: OS::Neutron::Router
     properties:
-      external_gateway_info: { network: { get_param: public_net_id }, enable_snat: true }
+      external_gateway_info: { network: { get_param: public_net_id } }
 
   router_subnet_connect:
     type: OS::Neutron::RouterInterface
