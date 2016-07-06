@@ -124,7 +124,9 @@ resources:
                   --hostname-override=${COREOS_PRIVATE_IPV4} \
                   --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
                   --tls-cert-file=/etc/kubernetes/ssl/worker.pem \
-                  --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem
+                  --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem \
+                  --cluster_dns=10.3.0.53 \
+                  --cluster_domain=cluster.local
                 Restart=always
                 RestartSec=10
                 [Install]

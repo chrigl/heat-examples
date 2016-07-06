@@ -167,7 +167,9 @@ resources:
                   --register-schedulable=false \
                   --allow-privileged=true \
                   --config=/etc/kubernetes/manifests \
-                  --hostname-override=${COREOS_PRIVATE_IPV4}
+                  --hostname-override=${COREOS_PRIVATE_IPV4} \
+                  --cluster_dns=10.3.0.53 \
+                  --cluster_domain=cluster.local
                 Restart=always
                 RestartSec=10
                 [Install]
