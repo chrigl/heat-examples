@@ -1,3 +1,16 @@
+# OpenStack Integration
+
+It is going to be harder than hoped… but as expected :(
+
+For the integration to work, I need to hostname-override with e.g. kubi-master-kubernetes-master0.
+But those ones are not available in the cluster. So kubectl logs breaks.
+
+When trying to use cinder, controller-manager gave me: "wrong cloud type".
+https://github.com/kubernetes/kubernetes/blob/master/pkg/volume/cinder/cinder.go#L187
+
+But: openstack was used --cloud-provider=openstack and no earlier error occured. So I think the parameters are correct.
+How to enable further debugging in kubelet?
+
 # on some etcd node, on a new setup:
 etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
 
@@ -66,5 +79,4 @@ optional
 * Hard coded ips for etcd, may result in duplication of OS::Nova::Server, instead of using a count on a resource group
 
 # missing
-* dns (https://coreos.com/kubernetes/docs/latest/deploy-addons.html)
 * calico (… do not need(?))
