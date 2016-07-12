@@ -98,6 +98,18 @@ resources:
                 template: { get_file: manifests/kube-scheduler.yaml }
                 params:
                   $hyperkube_version: { get_param: hyperkube_version }
+          - path: /etc/kubernetes/manifests/kube-addon-manager.yaml
+            permissions: "0600"
+            owner: root
+            content: { get_file: manifests/kube-addon-manager.yaml }
+          - path: /etc/kubernetes/addons/skydns-svc.yaml
+            permissions: "0600"
+            owner: root
+            content: { get_file: addons/skydns-svc.yaml }
+          - path: /etc/kubernetes/addons/skydns-rc.yaml
+            permissions: "0600"
+            owner: root
+            content: { get_file: addons/skydns-rc.yaml }
           - path: /etc/environment-kubelet
             permissions: "0600"
             owner: root
