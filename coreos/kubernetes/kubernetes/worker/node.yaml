@@ -89,6 +89,18 @@ resources:
                       - "="
                       - - "FLANNELD_ETCD_ENDPOINTS"
                         - { get_param: etcd_endpoints }
+          - path: /etc/kubernetes/cloud.conf
+            permissions: "0600"
+            owner: root
+            content: { get_file: ../../cloud.conf }
+          - path: /etc/environment-os-servername
+            permissions: "0600"
+            owner: root
+            content:
+              list_join:
+                - '='
+                - - "OS_SERVER_NAME"
+                  - { get_param: server_name }
 
         coreos:
           update:
@@ -115,18 +127,21 @@ resources:
                 ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
                 EnvironmentFile=/etc/environment
                 EnvironmentFile=/etc/environment-kubelet
+                EnvironmentFile=/etc/environment-os-servername
                 ExecStart=/usr/lib/coreos/kubelet-wrapper \
                   --api-servers=https://10.0.0.2 \
                   --network-plugin-dir=/etc/kubernetes/cni/net.d \
                   --register-node=true \
                   --allow-privileged=true \
                   --config=/etc/kubernetes/manifests \
-                  --hostname-override=${COREOS_PRIVATE_IPV4} \
+                  --hostname-override=${OS_SERVER_NAME} \
                   --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
                   --tls-cert-file=/etc/kubernetes/ssl/worker.pem \
                   --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem \
                   --cluster_dns=10.3.0.53 \
-                  --cluster_domain=cluster.local
+                  --cluster_domain=cluster.local \
+                  --cloud-provider=openstack \
+                  --cloud-config=/etc/kubernetes/cloud.conf
                 Restart=always
                 RestartSec=10
                 [Install]
