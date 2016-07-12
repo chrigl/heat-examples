@@ -1,3 +1,8 @@
+# Configure locksmith
+
+Currently there is no etcd cluster configured, but should be.
+Maybe local etcd should be started in proxy-mode to real cluster?
+
 # OpenStack Integration
 
 It is going to be harder than hoped… but as expected :(
