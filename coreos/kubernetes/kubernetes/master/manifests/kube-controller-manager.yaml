@@ -15,6 +15,8 @@ spec:
     - --leader-elect=true 
     - --service-account-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem
     - --root-ca-file=/etc/kubernetes/ssl/ca.pem
+    - --cloud-provider=openstack
+    - --cloud-config=/etc/kubernetes/cloud/openstack.conf
     livenessProbe:
       httpGet:
         host: 127.0.0.1
@@ -29,6 +31,9 @@ spec:
     - mountPath: /etc/ssl/certs
       name: ssl-certs-host
       readOnly: true
+    - mountPath: /etc/kubernetes/cloud
+      name: cloud-conf
+      readOnly: true
   volumes:
   - hostPath:
       path: /etc/kubernetes/ssl
@@ -36,3 +41,6 @@ spec:
   - hostPath:
       path: /usr/share/ca-certificates
     name: ssl-certs-host
+  - hostPath:
+      path: /etc/kubernetes/cloud
+    name: cloud-conf

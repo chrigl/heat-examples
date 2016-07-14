@@ -1,0 +1,4 @@
+openstack.conf
+tls/*.pem
+tls/*.csr
+tls/ca.srl

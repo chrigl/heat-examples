@@ -143,10 +143,10 @@ resources:
                   etcdctl --endpoints $FLANNELD_ETCD_ENDPOINTS set /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": { "Type": "vxlan" } }'
                   sleep 2
               done
-          - path: /etc/kubernetes/cloud.conf
+          - path: /etc/kubernetes/cloud/openstack.conf
             permissions: "0600"
             owner: root
-            content: { get_file: ../../cloud.conf }
+            content: { get_file: ../../openstack.conf }
           - path: /etc/environment-os-servername
             permissions: "0600"
             owner: root
@@ -196,7 +196,7 @@ resources:
                   --cluster_dns=10.3.0.53 \
                   --cluster_domain=cluster.local \
                   --cloud-provider=openstack \
-                  --cloud-config=/etc/kubernetes/cloud.conf
+                  --cloud-config=/etc/kubernetes/cloud/openstack.conf
                 Restart=always
                 RestartSec=10
                 [Install]

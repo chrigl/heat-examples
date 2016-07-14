@@ -1,0 +1,9 @@
+[Global]
+auth-url = OS_AUTH_URL
+username = OS_USERNAME
+password = OS_PASSWORD
+# (really ID _not_ NAME!!)
+tenant-id = OS_PROJECT_ID
+region = OS_REGION_NAME
+[LoadBalancer]
+subnet-id = YOUR_SUBNET
