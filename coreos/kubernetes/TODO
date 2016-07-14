@@ -1,3 +1,7 @@
+# Move etcd2 to fixed IPs
+
+The address-Space is large enough to use e.g. 10.1.0.1%index%
+
 # Configure locksmith
 
 Currently there is no etcd cluster configured, but should be.
@@ -15,6 +19,20 @@ https://github.com/kubernetes/kubernetes/blob/master/pkg/volume/cinder/cinder.go
 
 But: openstack was used --cloud-provider=openstack and no earlier error occured. So I think the parameters are correct.
 How to enable further debugging in kubelet?
+
+## Answer
+
+The option --cloud-provider has to go to manifests/kube-controller-manager.yaml as well
+
+## Still TODO: pseudo DNS
+I need to rename the nodes from IP to openstacks NODENAME. The apiserver needs to be able to connect the nodes by this name.
+A simple solution would be:
+* expose all hosts with IP and NODENAME somewhere to etcd
+* collect those etcd-keys on each node and construct a /etc/hosts
+* on master, this /etc/hosts has to go into pod apiserver as well
+
+More complex solution: real dns
+But therefor I would need a search domain to be able to configure e.g. skydns with this search domain.
 
 # on some etcd node, on a new setup:
 etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
