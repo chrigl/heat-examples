@@ -44,7 +44,7 @@ resources:
       gateway_ip: 10.0.0.1
       cidr: 10.0.0.0/8
       allocation_pools:
-        - { start: 10.0.0.10, end: 10.0.0.240 }
+        - { start: 10.4.0.2, end: 10.4.9.254 }  # officially 2000 Nodes are supported by kubernetes
 
   router:
     type: OS::Neutron::Router

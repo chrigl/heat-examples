@@ -29,7 +29,7 @@ $ heat resource-list kubi
 +-----------------------+-------------------------------------------------------------------------------------+------------------------------+-----------------+----------------------+
 ```
 
-and adjust the values in `02-etcd-stack-env.yaml`.
+and adjust the values of `network` and `subnet` in `02-etcd-stack-env.yaml`.
 
 
 The etcd-cluster is the first real component to create
@@ -37,15 +37,15 @@ The etcd-cluster is the first real component to create
 ```
 $ heat stack-create -f 02-etcd-stack.yaml -e 02-etcd-stack-env.yaml -P discovery_url=(curl "https://discovery.etcd.io/new?size=5") kubi-etcd
 $ nova list
-+--------------------------------------+------------------------+--------+------------+-------------+-----------------------------------+
-| ID                                   | Name                   | Status | Task State | Power State | Networks                          |
-+--------------------------------------+------------------------+--------+------------+-------------+-----------------------------------+
-| ca0f0a06-11dc-483a-99d2-ce047d070038 | kubi-etcd-etcd-server0 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.12 |
-| 46d3985e-526c-4d38-9417-6c4eb820c1ef | kubi-etcd-etcd-server1 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.11 |
-| d25f8bbe-d392-4bb0-a0e2-eccbdb9e8de8 | kubi-etcd-etcd-server2 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.14 |
-| c10597f1-b6e0-404c-9160-b0a2af6afe20 | kubi-etcd-etcd-server3 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.13 |
-| 04a202b4-2f9d-4fc2-88e4-31eb90e056cc | kubi-etcd-etcd-server4 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.15 |
-+--------------------------------------+------------------------+--------+------------+-------------+-----------------------------------+
++--------------------------------------+-------------+--------+------------+-------------+-----------------------------------+
+| ID                                   | Name        | Status | Task State | Power State | Networks                          |
++--------------------------------------+-------------+--------+------------+-------------+-----------------------------------+
+| ca0f0a06-11dc-483a-99d2-ce047d070038 | kubi-etcd0  | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.10 |
+| 46d3985e-526c-4d38-9417-6c4eb820c1ef | kubi-etcd1  | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.11 |
+| d25f8bbe-d392-4bb0-a0e2-eccbdb9e8de8 | kubi-etcd2  | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.12 |
+| c10597f1-b6e0-404c-9160-b0a2af6afe20 | kubi-etcd3  | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.13 |
+| 04a202b4-2f9d-4fc2-88e4-31eb90e056cc | kubi-etcd4  | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.14 |
++--------------------------------------+-------------+--------+------------+-------------+-----------------------------------+
 ```
 
 Edit `03-kubernetes-master-stack-env.yaml` and `04-kubernetes-worker-stack-env.yml` in the same way as `02-etcd-stack-env.yaml`, but also adjust the `etcd endpoints`.
@@ -71,12 +71,12 @@ $ nova list
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
 | ID                                   | Name                           | Status | Task State | Power State | Networks                                        |
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
-| ca0f0a06-11dc-483a-99d2-ce047d070038 | kubi-etcd-etcd-server0         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.12               |
-| 46d3985e-526c-4d38-9417-6c4eb820c1ef | kubi-etcd-etcd-server1         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.11               |
-| d25f8bbe-d392-4bb0-a0e2-eccbdb9e8de8 | kubi-etcd-etcd-server2         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.14               |
-| c10597f1-b6e0-404c-9160-b0a2af6afe20 | kubi-etcd-etcd-server3         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.13               |
-| 04a202b4-2f9d-4fc2-88e4-31eb90e056cc | kubi-etcd-etcd-server4         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.15               |
-| 348680fd-359b-42dc-9c31-a3e24d427c75 | kubi-master-kubernetes-master0 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.2, 77.247.85.192 |
+| ca0f0a06-11dc-483a-99d2-ce047d070038 | kubi-etcd0                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.10               |
+| 46d3985e-526c-4d38-9417-6c4eb820c1ef | kubi-etcd1                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.11               |
+| d25f8bbe-d392-4bb0-a0e2-eccbdb9e8de8 | kubi-etcd2                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.12               |
+| c10597f1-b6e0-404c-9160-b0a2af6afe20 | kubi-etcd3                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.13               |
+| 04a202b4-2f9d-4fc2-88e4-31eb90e056cc | kubi-etcd4                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.14               |
+| 348680fd-359b-42dc-9c31-a3e24d427c75 | kubi-master0                   | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.20,77.247.85.192 |
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
 ```
 
@@ -113,7 +113,7 @@ $ neutron floatingip-show cb87f842-e68e-4971-8894-3ca0cb2903e1
 +---------------------+--------------------------------------+
 | Field               | Value                                |
 +---------------------+--------------------------------------+
-| fixed_ip_address    | 10.0.0.2                             |
+| fixed_ip_address    | 10.0.0.20                            |
 | floating_ip_address | 77.247.85.192                        |
 | floating_network_id | 4c23774c-395b-49d0-b8e1-347e886fa9bf |
 | id                  | cb87f842-e68e-4971-8894-3ca0cb2903e1 |
@@ -133,8 +133,8 @@ Your cluster should be up an running
 $ kubectl cluster-info
 Kubernetes master is running at https://kubernetes-master
 $ kubectl get nodes
-NAME       STATUS                     AGE
-10.0.0.2   Ready,SchedulingDisabled   4m
+NAME           STATUS                     AGE
+kubi-master0   Ready,SchedulingDisabled   4m
 ```
 
 Now, create the namespace `kube-system`
@@ -148,11 +148,11 @@ After a while, all the kubernetes management pods show show up
 
 ```
 $ kubectl get pods --namespace kube-system
-NAME                               READY     STATUS    RESTARTS   AGE
-kube-apiserver-10.0.0.2            1/1       Running   0          1m
-kube-controller-manager-10.0.0.2   1/1       Running   0          8s
-kube-proxy-10.0.0.2                1/1       Running   0          40s
-kube-scheduler-10.0.0.2            1/1       Running   0          1m
+NAME                                   READY     STATUS    RESTARTS   AGE
+kube-apiserver-kubi-master0            1/1       Running   0          1m
+kube-controller-manager-kubi-master0   1/1       Running   0          8s
+kube-proxy-kubi-master0                1/1       Running   0          40s
+kube-scheduler-kubi-master0            1/1       Running   0          1m
 ```
 
 Start the worker nodes
@@ -163,22 +163,17 @@ $ nova list
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
 | ID                                   | Name                           | Status | Task State | Power State | Networks                                        |
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
-| ca0f0a06-11dc-483a-99d2-ce047d070038 | kubi-etcd-etcd-server0         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.12               |
-| 46d3985e-526c-4d38-9417-6c4eb820c1ef | kubi-etcd-etcd-server1         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.11               |
-| d25f8bbe-d392-4bb0-a0e2-eccbdb9e8de8 | kubi-etcd-etcd-server2         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.14               |
-| c10597f1-b6e0-404c-9160-b0a2af6afe20 | kubi-etcd-etcd-server3         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.13               |
-| 04a202b4-2f9d-4fc2-88e4-31eb90e056cc | kubi-etcd-etcd-server4         | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.15               |
-| 348680fd-359b-42dc-9c31-a3e24d427c75 | kubi-master-kubernetes-master0 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.2, 77.247.85.192 |
-| 59392ce1-e8d0-4f0f-8b4d-fae2b36a7465 | kubi-worker-kubernetes-worker0 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.18               |
-| 65f63ff0-ed87-432f-8326-bb290793681a | kubi-worker-kubernetes-worker1 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.22               |
-| f637687e-a7c7-4da9-8180-031e747f0096 | kubi-worker-kubernetes-worker2 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.23               |
-| f5dae297-5f13-49cf-80d0-5a97d4dff894 | kubi-worker-kubernetes-worker3 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.20               |
-| 621a5864-2560-44c3-85a6-e81418e737b5 | kubi-worker-kubernetes-worker4 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.25               |
-| 32cf9368-db5b-4d7f-b47c-02a82f9ddad7 | kubi-worker-kubernetes-worker5 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.16               |
-| 9f15ae00-4d2d-4ac4-8308-2ba66b49862f | kubi-worker-kubernetes-worker6 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.17               |
-| 73a4d143-d8ef-4ddc-8706-9d56db503de4 | kubi-worker-kubernetes-worker7 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.21               |
-| f468d1ec-776a-4a8e-a102-6593fbac24b8 | kubi-worker-kubernetes-worker8 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.24               |
-| cbfeda60-8963-4fd1-b543-35779e45a060 | kubi-worker-kubernetes-worker9 | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.19               |
+| ca0f0a06-11dc-483a-99d2-ce047d070038 | kubi-etcd0                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.12               |
+| 46d3985e-526c-4d38-9417-6c4eb820c1ef | kubi-etcd1                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.11               |
+| d25f8bbe-d392-4bb0-a0e2-eccbdb9e8de8 | kubi-etcd2                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.14               |
+| c10597f1-b6e0-404c-9160-b0a2af6afe20 | kubi-etcd3                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.13               |
+| 04a202b4-2f9d-4fc2-88e4-31eb90e056cc | kubi-etcd4                     | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.15               |
+| 348680fd-359b-42dc-9c31-a3e24d427c75 | kubi-master0                   | ACTIVE | -          | Running     | kubi-kubernetes-network=10.0.0.20,77.247.85.192 |
+| 59392ce1-e8d0-4f0f-8b4d-fae2b36a7465 | kubi-worker0                   | ACTIVE | -          | Running     | kubi-kubernetes-network=10.4.0.2                |
+| 65f63ff0-ed87-432f-8326-bb290793681a | kubi-worker1                   | ACTIVE | -          | Running     | kubi-kubernetes-network=10.4.0.3                |
+| f637687e-a7c7-4da9-8180-031e747f0096 | kubi-worker2                   | ACTIVE | -          | Running     | kubi-kubernetes-network=10.4.0.4                |
+| ...                                  | ...                            | ...    | ...        | ...         | ...                                             |
+| f5dae297-5f13-49cf-80d0-5a97d4dff894 | kubi-workerN                   | ACTIVE | -          | Running     | kubi-kubernetes-network=10.4.9.N                |
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
 ```
 
@@ -186,16 +181,10 @@ Again after a short while, the worker nodes should show up
 
 ```
 > kubectl get nodes
-NAME        STATUS                     AGE
-10.0.0.16   Ready                      1m
-10.0.0.17   Ready                      1m
-10.0.0.18   Ready                      1m
-10.0.0.19   Ready                      1m
-10.0.0.2    Ready,SchedulingDisabled   6m
-10.0.0.20   Ready                      1m
-10.0.0.21   Ready                      1m
-10.0.0.22   Ready                      1m
-10.0.0.23   Ready                      44s
-10.0.0.24   Ready                      57s
-10.0.0.25   Ready                      45s
+NAME          STATUS                     AGE
+kubi-worker0  Ready                      1m
+kubi-worker1  Ready                      1m
+kubi-master0  Ready,SchedulingDisabled   6m
+kubi-worker2  Ready                      1m
+kubi-workerN  Ready                      45s
 ```

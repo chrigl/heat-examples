@@ -19,6 +19,7 @@ parameters:
   etcd_endpoints:
     type: string
     description: Comma separated list of etcd server http://10.0.0.16:2389,
+    default: http://10.0.0.10:2389,http://10.0.0.11:2389,http://10.0.0.12:2389,http://10.0.0.13:2389,http://10.0.0.14:2389
   hyperkube_version:
     type: string
     description: hyperkube version see https://quay.io/repository/coreos/hyperkube?tab=tags
@@ -67,9 +68,9 @@ resources:
         properties:
           server_name:
             list_join:
-              - '-'
+              - ''
               - - { get_param: 'OS::stack_name' }
-                - kubernetes-master%index%
+                - %index%
           network: { get_param: network }
           subnet: { get_param: subnet }
           floating_ip: { get_param: floating_ip }
@@ -82,6 +83,11 @@ resources:
           security_groups:
             - default
             - { get_resource: kubernetes_master_security_group }
+          fixed_ip:
+            list_join:
+              - ''
+              - -'10.0.0.2'
+                - %index%
 
 outputs:
   servers:

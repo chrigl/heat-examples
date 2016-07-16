@@ -7,6 +7,9 @@ parameters:
   network:
     type: string
     description: Network to connect to. NO default value.
+  subnet:
+    type: string
+    description: Subnet to connect to. NO default value.
   key_name:
     type: string
     description: Name of keypair to assign to servers
@@ -62,10 +65,11 @@ resources:
         properties:
           server_name:
             list_join:
-              - '-'
+              - ''
               - - { get_param: 'OS::stack_name' }
-                - etcd-server%index%
+                - %index%
           network: { get_param: network }
+          subnet: { get_param: subnet }
           image: { get_param: image }
           flavor: { get_param: flavor }
           key_name: { get_param: key_name }
@@ -74,6 +78,11 @@ resources:
           security_groups:
             - default
             - { get_resource: etcd_security_group }
+          fixed_ip:
+            list_join:
+              - ''
+              - - '10.0.0.1'
+                - %index%
 
 outputs:
   servers:

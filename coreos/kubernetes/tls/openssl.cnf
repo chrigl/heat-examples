@@ -9,4 +9,6 @@ subjectAltName = @alt_names
 [alt_names]
 DNS.1 = kubernetes-master
 IP.1 = 10.3.0.1
-IP.2 = 10.0.0.2
+IP.2 = 10.0.0.20
+IP.3 = 10.0.0.21
+IP.4 = 10.0.0.22

@@ -1,7 +1,7 @@
 heat_template_version: 2014-10-16
 
 description: >
-  etcd node
+  Kubernetes master node
 
 parameters:
   network:
@@ -28,7 +28,7 @@ parameters:
   fixed_ip:
     type: string
     description: Fixed ip of kubernetes-master
-    default: 10.0.0.2
+    default: 10.0.0.20
   server_name:
     type: string
     default: kubernetes-master

@@ -129,7 +129,7 @@ resources:
                 EnvironmentFile=/etc/environment-kubelet
                 EnvironmentFile=/etc/environment-os-servername
                 ExecStart=/usr/lib/coreos/kubelet-wrapper \
-                  --api-servers=https://10.0.0.2 \
+                  --api-servers=https://10.0.0.20 \
                   --network-plugin-dir=/etc/kubernetes/cni/net.d \
                   --register-node=true \
                   --allow-privileged=true \

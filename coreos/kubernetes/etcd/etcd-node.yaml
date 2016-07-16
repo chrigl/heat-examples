@@ -7,6 +7,12 @@ parameters:
   network:
     type: string
     description: Network to connect to. NO default value.
+  subnet:
+    type: string
+    description: Subnet to connect to. NO default value.
+  fixed_ip:
+    type: string
+    description: Fixed ip of kubernetes-master
   key_name:
     type: string
     description: Name of keypair to assign to servers
@@ -85,6 +91,9 @@ resources:
     properties:
       network: { get_param: network }
       security_groups: { get_param: security_groups }
+      fixed_ips:
+        - subnet_id: { get_param: subnet }
+          ip_address: { get_param: fixed_ip }
 
 outputs:
   server:

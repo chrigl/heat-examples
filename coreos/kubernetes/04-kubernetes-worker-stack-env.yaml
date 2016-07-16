@@ -2,5 +2,4 @@ parameters:
   key_name: cglaubitz
   image: "CoreOS Stable"
   hyperkube_version: "v1.3.0_coreos.0"
-  etcd_endpoints: "http://10.0.0.11:2379,http://10.0.0.12:2379,http://10.0.0.13:2379,http://10.0.0.14:2379,http://10.0.0.15:2379"
   network: d321c87e-ab69-4353-b718-3903aeb6489e

@@ -1,3 +1,4 @@
 parameters:
   key_name: cglaubitz
   network: c620e1d1-62de-4bb6-b8ed-a13fbde02918
+  subnet: cc64e222-c1ee-4059-a518-4a3f65dec4b8
