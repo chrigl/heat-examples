@@ -2,4 +2,4 @@ parameters:
   key_name: cglaubitz
   image: "CoreOS Stable"
   hyperkube_version: "v1.3.0_coreos.0"
-  network: d321c87e-ab69-4353-b718-3903aeb6489e
+  network: f1bc7f50-4a40-415b-ad36-c0bac0655cd4

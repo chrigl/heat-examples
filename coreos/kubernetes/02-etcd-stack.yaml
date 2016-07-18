@@ -67,7 +67,7 @@ resources:
             list_join:
               - ''
               - - { get_param: 'OS::stack_name' }
-                - %index%
+                - "%index%"
           network: { get_param: network }
           subnet: { get_param: subnet }
           image: { get_param: image }
@@ -82,7 +82,7 @@ resources:
             list_join:
               - ''
               - - '10.0.0.1'
-                - %index%
+                - "%index%"
 
 outputs:
   servers:

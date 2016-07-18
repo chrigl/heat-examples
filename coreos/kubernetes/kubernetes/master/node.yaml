@@ -21,7 +21,7 @@ parameters:
     description: Name of image to use for servers
   etcd_endpoints:
     type: string
-    description: Comma separated list of etcd server http://10.0.0.16:2389,
+    description: Comma separated list of etcd server http://10.0.0.16:2379,
   hyperkube_version:
     type: string
     description: hyperkube version see https://quay.io/repository/coreos/hyperkube?tab=tags
