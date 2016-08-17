@@ -1,9 +1,24 @@
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    tier: mysql
+    app: wordpress
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: mysql
   labels:
-    name: mysql
+    tier: mysql
+    app: wordpress
 spec:
   containers:
     - resources:
@@ -28,6 +43,18 @@ spec:
           mountPath: /var/lib/mysql
   volumes:
     - name: mysql-persistent-storage
-      cinder:
-        volumeID: ff523432-2f63-4b0d-ae36-92589c667632
-        fsType: ext4
+      persistentVolumeClaim:
+        claimName: mysql-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: wordpress
+    tier: mysql

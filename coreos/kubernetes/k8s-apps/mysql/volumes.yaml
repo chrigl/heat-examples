@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-storage1
+  labels:
+    tier: storage
+    app: wordpress
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  cinder:
+    fsType: ext4
+    volumeID: "e801597d-2693-4fcc-ad14-b61572d4fc20"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-storage2
+  labels:
+    tier: storage
+    app: wordpress
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  cinder:
+    fsType: ext4
+    volumeID: "ff523432-2f63-4b0d-ae36-92589c667632"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-storage3
+  labels:
+    tier: storage
+    app: wordpress
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  cinder:
+    fsType: ext4
+    volumeID: "2da64748-9dc5-4c3e-b1fa-da06606a764d"
