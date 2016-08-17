@@ -132,6 +132,14 @@ resources:
                       - "="
                       - - "FLANNELD_ETCD_ENDPOINTS"
                         - { get_param: etcd_endpoints }
+          - path: /etc/environment-dnsexport
+            permissions: "0600"
+            owner: root
+            content:
+              list_join:
+                - '='
+                - - "ETCDCTL_ENDPOINT"
+                  - { get_param: etcd_endpoints }
           - path: /etc/flannel/setup_etcd_config.sh
             permissions: "0700"
             owner: root
@@ -155,6 +163,16 @@ resources:
                 - '='
                 - - "OS_SERVER_NAME"
                   - { get_param: server_name }
+          - path: /etc/kubernetes/resolv.conf
+            permissions: "0600"
+            owner: root
+            content: |
+              search machines.local
+              nameserver 10.0.0.10
+              nameserver 10.0.0.11
+              nameserver 10.0.0.12
+              nameserver 10.0.0.13
+              nameserver 10.0.0.14
 
         coreos:
           update:
@@ -180,7 +198,7 @@ resources:
                     After=flanneld.service
               command: start
             - name: kubelet.service
-              content : |
+              content: |
                 [Service]
                 ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
                 EnvironmentFile=/etc/environment
@@ -201,6 +219,22 @@ resources:
                 RestartSec=10
                 [Install]
                 WantedBy=multi-user.target 
+              command: start
+              enable: true
+            - name: dnsexport.service
+              content: |
+                [Unit]
+                Description=Exporting nodename to etcd
+                [Service]
+                Type=simple
+                EnvironmentFile=/etc/environment
+                EnvironmentFile=/etc/environment-dnsexport
+                EnvironmentFile=/etc/environment-os-servername
+                ExecStart=/bin/etcdctl set /skydns/local/machines/${OS_SERVER_NAME} "{\"host\": \"${COREOS_PRIVATE_IPV4}\"}"
+                Restart=on-failure
+                RestartSec=10
+                [Install]
+                WantedBy=multi-user.target
               command: start
               enable: true
 

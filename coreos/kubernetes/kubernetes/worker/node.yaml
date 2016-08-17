@@ -89,6 +89,14 @@ resources:
                       - "="
                       - - "FLANNELD_ETCD_ENDPOINTS"
                         - { get_param: etcd_endpoints }
+          - path: /etc/environment-dnsexport
+            permissions: "0600"
+            owner: root
+            content:
+              list_join:
+                - '='
+                - - "ETCDCTL_ENDPOINT"
+                  - { get_param: etcd_endpoints }
           - path: /etc/kubernetes/cloud/openstack.conf
             permissions: "0600"
             owner: root
@@ -143,6 +151,22 @@ resources:
                   --cloud-provider=openstack \
                   --cloud-config=/etc/kubernetes/cloud/openstack.conf
                 Restart=always
+                RestartSec=10
+                [Install]
+                WantedBy=multi-user.target
+              command: start
+              enable: true
+            - name: dnsexport.service
+              content: |
+                [Unit]
+                Description=Exporting nodename to etcd
+                [Service]
+                Type=simple
+                EnvironmentFile=/etc/environment
+                EnvironmentFile=/etc/environment-dnsexport
+                EnvironmentFile=/etc/environment-os-servername
+                ExecStart=/bin/etcdctl set /skydns/local/machines/${OS_SERVER_NAME} "{\"host\": \"${COREOS_PRIVATE_IPV4}\"}"
+                Restart=on-failure
                 RestartSec=10
                 [Install]
                 WantedBy=multi-user.target
