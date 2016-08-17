@@ -1,4 +1,5 @@
 parameters:
   key_name: cglaubitz
-  network: c620e1d1-62de-4bb6-b8ed-a13fbde02918
-  subnet: cc64e222-c1ee-4059-a518-4a3f65dec4b8
+  image: "CoreOS Stable 1068.6.0"
+  network: f1bc7f50-4a40-415b-ad36-c0bac0655cd4
+  subnet: 1ddefd36-86aa-4378-b062-52077434a278

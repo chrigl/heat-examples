@@ -19,7 +19,6 @@ parameters:
   image:
     type: string
     description: Name of image to use for servers
-    default: CoreOS Stable
   proxy_mode:
     type: string
     description: enable or disable etcd2 proxy mode (on/off). Default off.
