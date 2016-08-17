@@ -2,7 +2,7 @@
 
 Dependency: `make` and `openssl`
 
-This installation expects to have access to OpenStack. You have to move `openstack.conf.sample` to `openstack.conf` and place credentails into this file. If you do *not* want to connect kubernetes to OpenStack, it should be enough to ship `openstack.conf.sample` as `openstack.conf`. Kubernetes will not struggle over it, but may report some errors. So the best is to remove `--cloud-config=/etc/kubernetes/cloud/openstack.conf` from `kubernetes/master/manifests/kube-controller-manager.yaml`, `kubernetes/master/node.yaml` and `kubernetes/worker/node.yaml`.
+This installation expects to have access to OpenStack. You have to move `openstack.conf.sample` to `openstack.conf` and place credentails into this file. If you do *not* want to connect kubernetes to OpenStack, you have to remove `--cloud-config=/etc/kubernetes/cloud/openstack.conf` from `kubernetes/master/manifests/kube-controller-manager.yaml`, `kubernetes/master/node.yaml` and `kubernetes/worker/node.yaml`. You could also remove the `write_files` of `/etc/kubernetes/cloud/openstack.conf` from `kubernetes/master/node.yaml` and `kubernetes/worker/node.yaml`. If `openstack.conf.sample`, or another error is in this file, kubernetes refuses to start. If you get an error like `Could not fetch contents for file:///Users/chris/heat-examples/coreos/kubernetes/openstack.conf`, there is some remainig `write_files` in some some yaml.
 
 
 First of all, you need to configure your public_net_id in `01-network-stack-env.yaml`, and setup the network. Also replace the `key name` in all the `*-env.yml`-files, or use `-P key_name=YOUR_KEY` with `heat`.
