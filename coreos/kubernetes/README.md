@@ -140,13 +140,6 @@ NAME           STATUS                     AGE
 kubi-master0   Ready,SchedulingDisabled   4m
 ```
 
-Now, create the namespace `kube-system`
-
-```
-$ kubectl create namespace kube-system
-namespace "kube-system" created
-```
-
 After a while, all the kubernetes management pods show show up
 
 ```
