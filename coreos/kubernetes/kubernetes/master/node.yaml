@@ -43,7 +43,7 @@ parameters:
     default: default
   coreos_reboot_strategy:
     type: string
-    default: "off"
+    default: "etcd-lock"
     description: Enable or disable reboot for update (best-effort|etcd-lock|reboot|off). Default off.
 
 resources:
@@ -177,6 +177,11 @@ resources:
         coreos:
           update:
             reboot-strategy: { get_param: coreos_reboot_strategy }
+          locksmith:
+            endpoint: { get_param: etcd_endpoints }
+            group: master
+            window_start: "01:00"
+            window_length: "2h"
           units:
             - name: flanneld.service
               drop-ins:

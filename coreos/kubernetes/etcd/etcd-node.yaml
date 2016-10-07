@@ -40,7 +40,7 @@ parameters:
     default: default
   coreos_reboot_strategy:
     type: string
-    default: "off"
+    default: "etcd-lock"
     description: Enable or disable reboot for update (best-effort|etcd-lock|reboot|off). Default off.
 
 resources:
@@ -64,6 +64,11 @@ resources:
             # legacy ports can be omitted if your application doesn't depend on them
             listen-client-urls: http://0.0.0.0:2379
             listen-peer-urls: http://$private_ipv4:2380
+          locksmith:
+            endpoint: http://$private_ipv4:2379
+            group: etcd
+            window_start: "23:00"
+            window_length: 2h
           units:
             - name: etcd2.service
               command: start

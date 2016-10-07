@@ -33,7 +33,7 @@ parameters:
     description: Flavor to use for nodes
   coreos_reboot_strategy:
     type: string
-    default: "off"
+    default: "etcd-lock"
     description: Enable or disable reboot for update (best-effort|etcd-lock|reboot|off). Default off.
 
 resources:
