@@ -1,13 +1,37 @@
-# Move etcd2 to fixed IPs
+# Remove deprecations since v1.4.0
+
+Oct 07 17:56:06 kubi-master0.novalocal kubelet-wrapper[16167]: Flag --config has been deprecated, Use --pod-manifest-path instead. Will be removed in a future version.
+Oct 07 17:56:06 kubi-master0.novalocal kubelet-wrapper[16167]: Flag --api-servers has been deprecated, Use --kubeconfig instead. Will be removed in a future version.
+
+# Use local dns in kube-proxy
+
+Use the dns-mechanism from kube-apiserver in kube-proxy as well to get rid of this:
+
+```
+W1007 18:24:33.637123       1 server.go:417] Failed to retrieve node info: nodes "kubi-worker0.novalocal" not found
+W1007 18:24:33.637337       1 proxier.go:226] invalid nodeIP, initialize kube-proxy with 127.0.0.1 as nodeIP
+```
+
+Therefor, `--hostname-override=$openstack servername$` must be set.
+
+# Move etcd2 to fixed IPs (done)
 
 The address-Space is large enough to use e.g. 10.1.0.1%index%
 
-# Configure locksmith
+## Answer
+
+Done
+
+# Configure locksmith (partially done)
 
 Currently there is no etcd cluster configured, but should be.
 Maybe local etcd should be started in proxy-mode to real cluster?
 
-# OpenStack Integration
+## Answer
+
+Done with auto updates enabled. This should be rethought on worker nodes, because they are not drained automatically.
+
+# OpenStack Integration (done)
 
 It is going to be harder than hoped… but as expected :(
 
@@ -24,7 +48,7 @@ How to enable further debugging in kubelet?
 
 The option --cloud-provider has to go to manifests/kube-controller-manager.yaml as well
 
-## Still TODO: pseudo DNS
+## pseudo DNS (done)
 I need to rename the nodes from IP to openstacks NODENAME. The apiserver needs to be able to connect the nodes by this name.
 A simple solution would be:
 * expose all hosts with IP and NODENAME somewhere to etcd
@@ -34,13 +58,20 @@ A simple solution would be:
 More complex solution: real dns
 But therefor I would need a search domain to be able to configure e.g. skydns with this search domain.
 
-# on some etcd node, on a new setup:
+Done by real skydns on etcd nodes. Additional /etc/kubernetes/resolv.conf is shipped and hooked into kube-apiserver.
+
+
+# on some etcd node, on a new setup: (done)
 etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
 
 Using vxlan does not include the flanneld to encapsulate the traffic, but the kernel will do. This may be a bit more performant.
 etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": { "Type": "vxlan" } }'
 
 host-gw is unfortunately not usable, because the underlying network in openstack, only routes traffic from known mac addresses.
+
+## Answer
+
+Done by cluster setup
 
 # setting up kubectl(? or External IP on master)
 https://coreos.com/kubernetes/docs/latest/configure-kubectl.html
@@ -50,7 +81,7 @@ https://coreos.com/kubernetes/docs/latest/configure-kubectl.html
 Exporting the api. So the setup can be on the users computer.
 The cert only includes the DNS name "kubernetes-master". So you have to add this, with the associated floating ip, into your /etc/hosts
 
-# cluster-ip... whats that? configured by me, is not valid
+# cluster-ip... whats that? configured by me, is not valid (done)
 core@kubernetes-master ~ $ kubectl get services
 NAME         CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
 kubernetes   10.254.254.1   <none>        443/TCP   1h
@@ -65,11 +96,13 @@ These are available from all nodes.
 
 Changed to 10.3.0.0/24
 
-# Create namespace "kube-system"
+# Create namespace "kube-system" (done)
 ERROR: namespaces "kube-system" not found
 http://kubernetes.io/docs/admin/namespaces/
 
 ## Answer
+
+Nothing TODO on kubernetes 1.3+
 
 Currently, this must be done by hand after the bootstrap.
 kubectl create namespace kube-system
