@@ -37,8 +37,8 @@ resources:
           - - { get_param: 'OS::stack_name' }
             - { get_param: subnet_name }
       dns_nameservers:
-        - 37.123.105.116
-        - 37.123.105.117
+        - 8.8.8.8
+        - 8.8.4.4
       network_id: { get_resource: network }
       ip_version: 4
       gateway_ip: 10.0.0.1
