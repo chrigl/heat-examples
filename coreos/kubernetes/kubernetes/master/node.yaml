@@ -65,6 +65,12 @@ resources:
             permissions: "0600"
             owner: root
             content: { get_file: ../../tls/apiserver-key.pem }
+          - path: /etc/kubernetes/ssl/worker.pem
+            permissions: "0600"
+            content: { get_file: ../../tls/worker.pem }
+          - path: /etc/kubernetes/ssl/worker-key.pem
+            permissions: "0600"
+            content: { get_file: ../../tls/worker-key.pem }
           - path: /etc/kubernetes/manifests/kube-proxy.yaml
             permissions: "0600"
             owner: root
@@ -116,7 +122,7 @@ resources:
             content:
               list_join:
                 - '='
-                - - "KUBELET_VERSION"
+                - - "KUBELET_IMAGE_TAG"
                   - { get_param: hyperkube_version }
           - path: /etc/flannel/options.env
             permissions: "0600"
@@ -173,6 +179,28 @@ resources:
               nameserver 10.0.0.12
               nameserver 10.0.0.13
               nameserver 10.0.0.14
+          - path: /etc/kubernetes/kubeconfig
+            permissions: "0644"
+            owner: root
+            content: |
+              apiVersion: v1
+              kind: Config
+              clusters:
+              - name: local
+                cluster:
+                  certificate-authority: /etc/kubernetes/ssl/ca.pem
+                  server: http://127.0.0.1:8080
+              users:
+              - name: kubelet
+                user:
+                  client-certificate: /etc/kubernetes/ssl/worker.pem
+                  client-key: /etc/kubernetes/ssl/worker-key.pem
+              contexts:
+              - context:
+                  cluster: local
+                  user: kubelet
+                name: kubelet-context
+              current-context: kubelet-context
 
         coreos:
           update:
@@ -210,16 +238,18 @@ resources:
                 EnvironmentFile=/etc/environment-kubelet
                 EnvironmentFile=/etc/environment-os-servername
                 ExecStart=/usr/lib/coreos/kubelet-wrapper \
-                  --api-servers=http://127.0.0.1:8080 \
+                  --require-kubeconfig \
+                  --kubeconfig=/etc/kubernetes/kubeconfig \
                   --network-plugin-dir=/etc/kubernetes/cni/net.d \
                   --register-schedulable=false \
                   --allow-privileged=true \
-                  --config=/etc/kubernetes/manifests \
+                  --pod-manifest-path=/etc/kubernetes/manifests \
                   --hostname-override=${OS_SERVER_NAME} \
                   --cluster_dns=10.3.0.53 \
                   --cluster_domain=cluster.local \
                   --cloud-provider=openstack \
                   --cloud-config=/etc/kubernetes/cloud/openstack.conf
+
                 Restart=always
                 RestartSec=10
                 [Install]
