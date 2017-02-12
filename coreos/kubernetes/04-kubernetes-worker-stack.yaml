@@ -13,7 +13,7 @@ parameters:
   etcd_endpoints:
     type: string
     description: Comma separated list of etcd server http://10.0.0.16:2379,
-    default: http://10.0.0.10:2379,http://10.0.0.11:2379,http://10.0.0.12:2379,http://10.0.0.13:2379,http://10.0.0.14:2379
+    default: http://10.0.0.10:2379,http://10.0.0.11:2379,http://10.0.0.12:2379
   hyperkube_version:
     type: string
     description: hyperkube version see https://quay.io/repository/coreos/hyperkube?tab=tags
@@ -26,7 +26,6 @@ parameters:
     description: Name of image to use for servers
   flavor:
     type: string
-    default: m1.micro
     description: Flavor to use for nodes
   coreos_reboot_strategy:
     type: string
@@ -45,17 +44,33 @@ resources:
           - - { get_param: 'OS::stack_name' }
             - kubernetes-worker
       rules:
+        - direction: ingress
+          ethertype: IPv4
+          remote_mode: remote_group_id
+        - direction: ingress
+          ethertype: IPv6
+          remote_mode: remote_group_id
         - remote_ip_prefix: 0.0.0.0/0
+          direction: egress
+          ethertype: IPv4
+        - remote_ip_prefix: ::/0
+          direction: egress
+          ethertype: IPv6
+        - remote_ip_prefix: 0.0.0.0/0
+          direction: ingress
           protocol: tcp
           port_range_min: 22
           port_range_max: 22
         - remote_ip_prefix: 0.0.0.0/0
+          direction: ingress
           protocol: icmp
         - remote_ip_prefix: 0.0.0.0/0
+          direction: ingress
           protocol: tcp
           port_range_min: 443
           port_range_max: 443
         - remote_ip_prefix: 0.0.0.0/0
+          direction: ingress
           protocol: tcp
           port_range_min: 30000
           port_range_max: 32767

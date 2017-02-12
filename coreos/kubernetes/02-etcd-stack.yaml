@@ -26,10 +26,9 @@ parameters:
   cluster_size:
     type: string
     description: size of the etcd cluster
-    default: 5
+    default: 3
   flavor:
     type: string
-    default: m1.micro
     description: Flavor to use for nodes
   coreos_reboot_strategy:
     type: string
@@ -48,11 +47,25 @@ resources:
           - - { get_param: 'OS::stack_name' }
             - etcd
       rules:
+        - direction: ingress
+          ethertype: IPv4
+          remote_mode: remote_group_id
+        - direction: ingress
+          ethertype: IPv6
+          remote_mode: remote_group_id
         - remote_ip_prefix: 0.0.0.0/0
+          direction: egress
+          ethertype: IPv4
+        - remote_ip_prefix: ::/0
+          direction: egress
+          ethertype: IPv6
+        - remote_ip_prefix: 0.0.0.0/0
+          direction: ingress
           protocol: tcp
           port_range_min: 22
           port_range_max: 22
         - remote_ip_prefix: 0.0.0.0/0
+          direction: ingress
           protocol: icmp
 
   etcd_servers:
