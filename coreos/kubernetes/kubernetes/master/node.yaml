@@ -108,14 +108,14 @@ resources:
             permissions: "0600"
             owner: root
             content: { get_file: manifests/kube-addon-manager.yaml }
-          - path: /etc/kubernetes/addons/skydns-svc.yaml
+          - path: /etc/kubernetes/addons/kubedns-svc.yaml
             permissions: "0600"
             owner: root
-            content: { get_file: addons/skydns-svc.yaml }
-          - path: /etc/kubernetes/addons/skydns-rc.yaml
+            content: { get_file: addons/kubedns-svc.yaml }
+          - path: /etc/kubernetes/addons/kubedns-controller.yaml
             permissions: "0600"
             owner: root
-            content: { get_file: addons/skydns-rc.yaml }
+            content: { get_file: addons/kubedns-controller.yaml }
           - path: /etc/environment-kubelet
             permissions: "0600"
             owner: root
@@ -177,8 +177,6 @@ resources:
               nameserver 10.0.0.10
               nameserver 10.0.0.11
               nameserver 10.0.0.12
-              nameserver 10.0.0.13
-              nameserver 10.0.0.14
           - path: /etc/kubernetes/kubeconfig
             permissions: "0644"
             owner: root

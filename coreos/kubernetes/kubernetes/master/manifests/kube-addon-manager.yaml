@@ -5,12 +5,12 @@ metadata:
   namespace: kube-system
   labels:
     component: kube-addon-manager
-    version: v4
+    version: v6.1
 spec:
   hostNetwork: true
   containers:
   - name: kube-addon-manager
-    image: gcr.io/google-containers/kube-addon-manager:v5.1
+    image: gcr.io/google-containers/kube-addon-manager:v6.1
     resources:
       requests:
         cpu: 5m
