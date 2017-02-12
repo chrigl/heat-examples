@@ -1,7 +1,8 @@
 parameters:
   key_name: cglaubitz
-  image: "CoreOS Stable 1068.6.0"
-  hyperkube_version: "v1.3.4_coreos.0"
-  network: f1bc7f50-4a40-415b-ad36-c0bac0655cd4
-  subnet: 1ddefd36-86aa-4378-b062-52077434a278
-  floating_ip: 95611b32-0344-4a01-bf6d-ea64f7db3367
+  image: "CoreOS Stable 1235.9.0"
+  hyperkube_version: "v1.5.2_coreos.2"
+  network: 37fa31c9-991a-463e-9629-7ece64fb2c62
+  subnet: 52d9d935-4b6e-481c-a3d1-83a83c13fde8
+  floating_ip: 445fd4fe-9932-4c2d-a55a-dba0555493c7
+  flavor: std.S
