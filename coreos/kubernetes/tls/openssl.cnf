@@ -8,6 +8,8 @@ keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 subjectAltName = @alt_names
 [alt_names]
 DNS.1 = kubernetes-master
+DNS.2 = kubernetes.default
+DNS.3 = kubernetes.default.svc.cluster.local
 IP.1 = 10.3.0.1
 IP.2 = 10.0.0.20
 IP.3 = 10.0.0.21
