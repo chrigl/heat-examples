@@ -2,8 +2,8 @@
 auth-url = OS_AUTH_URL
 username = OS_USERNAME
 password = OS_PASSWORD
-# (really ID _not_ NAME!!)
-tenant-id = OS_PROJECT_ID
+tenant-name = OS_PROJECT_NAME
+domain-name = OS_DEFAULT_DOMAIN
 region = OS_REGION_NAME
 [LoadBalancer]
-subnet-id = YOUR_SUBNET
+subnet-id = FLOATING IP SUBNET
