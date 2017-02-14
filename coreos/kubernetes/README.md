@@ -5,6 +5,25 @@
 
 NOTE: This stack is not updateable!
 
+Dependency: `make` and `openssl`
+
+
+Create ssl stuff
+
+```
+$ make
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C tls all
+openssl genrsa -out ca-key.pem 2048
+Generating RSA private key, 2048 bit long modulus
+...........+++
+[...]
+```
+
+Download the [CoreOS image](https://coreos.com/os/docs/latest/booting-on-openstack.html), and upload it to glance. Adjust the image name in `full-stack-env.yaml`.
+
+
+Start the stack:
+
 ```
 $ openstack stack create -t full-stack.yaml -e full-stack-env.yaml --parameter key_name=cg --parameter discovery_url=$(curl "https://discovery.etcd.io/new?size=3") --parameter worker_count=5 kubi
 ```
@@ -12,7 +31,7 @@ $ openstack stack create -t full-stack.yaml -e full-stack-env.yaml --parameter k
 In the meantime, you should setup kubectl on your host
 
 ```
-> cat ~/.kube/config
+$ cat ~/.kube/config
 apiVersion: v1
 clusters:
 - cluster:
