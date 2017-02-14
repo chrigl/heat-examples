@@ -97,10 +97,6 @@ resources:
                 - '='
                 - - "ETCDCTL_ENDPOINT"
                   - { get_param: etcd_endpoints }
-          - path: /etc/kubernetes/cloud/openstack.conf
-            permissions: "0600"
-            owner: root
-            content: { get_file: ../../openstack.conf }
           - path: /etc/environment-os-servername
             permissions: "0600"
             owner: root
