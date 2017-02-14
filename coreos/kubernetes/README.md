@@ -3,7 +3,7 @@
 
 ## The easy way
 
-NOTE: This stack is not updateable!
+NOTE: This stack is not updatable!
 
 Dependency: `make` and `openssl`
 
