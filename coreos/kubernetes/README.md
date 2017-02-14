@@ -1,5 +1,78 @@
 # Setting up a kubernetes cluster
 
+
+## The easy way
+
+NOTE: This stack is not updateable!
+
+```
+$ openstack stack create -t full-stack.yaml -e full-stack-env.yaml --parameter key_name=cg --parameter discovery_url=$(curl "https://discovery.etcd.io/new?size=3") --parameter worker_count=5 kubi
+```
+
+In the meantime, you should setup kubectl on your host
+
+```
+> cat ~/.kube/config
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: /Users/chris/heat-examples/coreos/kubernetes/tls/ca.pem
+    server: https://kubernetes-master
+  name: default-cluster
+contexts:
+- context:
+    cluster: default-cluster
+    user: default-admin
+  name: default-system
+current-context: default-system
+kind: Config
+preferences: {}
+users:
+- name: default-admin
+  user:
+    client-certificate: /Users/chris/heat-examples/coreos/kubernetes/tls/admin.pem
+    client-key: /Users/chris/heat-examples/coreos/kubernetes/tls/admin-key.pem
+```
+
+
+After a while there should be some nodes:
+```
+$ openstack server list
++--------------------------------------+------------------------------------------------+--------+---------------------------------------------------------------------------------------+------------------------+
+| ID                                   | Name                                           | Status | Networks                                                                              | Image Name             |
++--------------------------------------+------------------------------------------------+--------+---------------------------------------------------------------------------------------+------------------------+
+| 608be14d-9003-46dc-a3dc-d8263e9760e8 | kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d1  | ACTIVE | kubi-network-5lnrdwlqupjr-0-w4o6irt24rg7-kubernetes-network=10.4.0.8                  | CoreOS Stable 1235.9.0 |
+| c94b4fd5-3dd9-47b4-a06e-ef58e596b255 | kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d2  | ACTIVE | kubi-network-5lnrdwlqupjr-0-w4o6irt24rg7-kubernetes-network=10.4.0.7                  | CoreOS Stable 1235.9.0 |
+| 30946ffc-66b9-4f46-b01e-74aa70490bb2 | kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d0  | ACTIVE | kubi-network-5lnrdwlqupjr-0-w4o6irt24rg7-kubernetes-network=10.4.0.6                  | CoreOS Stable 1235.9.0 |
+| 00aa0dc9-d3f9-458c-956a-f15b69d21ed6 | kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d4  | ACTIVE | kubi-network-5lnrdwlqupjr-0-w4o6irt24rg7-kubernetes-network=10.4.0.5                  | CoreOS Stable 1235.9.0 |
+| 922b5016-b720-4e60-a19c-ca18835cdf4c | kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d3  | ACTIVE | kubi-network-5lnrdwlqupjr-0-w4o6irt24rg7-kubernetes-network=10.4.0.4                  | CoreOS Stable 1235.9.0 |
+| 7e0b2ee2-025d-41f5-9a08-5f5403060b11 | kubi-kube-master-jydbgdzztbg4-0-bxosimo4vzqq0  | ACTIVE | kubi-network-5lnrdwlqupjr-0-w4o6irt24rg7-kubernetes-network=10.0.0.20, 185.115.51.177 | CoreOS Stable 1235.9.0 |
+| 848e36d5-5e2f-41c4-8347-85c62d05bf1d | kubi-etcd-cluster-kzhknwrpqbad-0-727oxf4tneff0 | ACTIVE | kubi-network-5lnrdwlqupjr-0-w4o6irt24rg7-kubernetes-network=10.0.0.10                 | CoreOS Stable 1235.9.0 |
+| 41baf64f-4e75-46be-972d-b4fbf8e8c713 | kubi-etcd-cluster-kzhknwrpqbad-0-727oxf4tneff1 | ACTIVE | kubi-network-5lnrdwlqupjr-0-w4o6irt24rg7-kubernetes-network=10.0.0.11                 | CoreOS Stable 1235.9.0 |
+| 15c72222-023f-4fe9-b374-854b6cf74984 | kubi-etcd-cluster-kzhknwrpqbad-0-727oxf4tneff2 | ACTIVE | kubi-network-5lnrdwlqupjr-0-w4o6irt24rg7-kubernetes-network=10.0.0.12                 | CoreOS Stable 1235.9.0 |
++--------------------------------------+------------------------------------------------+--------+---------------------------------------------------------------------------------------+------------------------+
+```
+
+Add the floating ip to your `/etc/hosts`:
+
+```
+$ vi /etc/hosts
+185.115.51.117 kubernetes-master
+
+$ kubectl cluster-info
+Kubernetes master is running at https://kubernetes-master
+$ kubectl get nodes
+NAME                                            STATUS                     AGE
+kubi-kube-master-jydbgdzztbg4-0-bxosimo4vzqq0   Ready,SchedulingDisabled   51m
+kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d0   Ready                      51m
+kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d1   Ready                      51m
+kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d2   Ready                      50m
+kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d3   Ready                      51m
+kubi-kube-worker-ycnoukyptmzw-0-xuflmcdypg5d4   Ready                      51m
+```
+
+## The hard way
+
 Dependency: `make` and `openssl`
 
 This installation expects to have access to OpenStack. You have to move `openstack.conf.sample` to `openstack.conf` and place credentails into this file. If you do *not* want to connect kubernetes to OpenStack, you have to remove `--cloud-config=/etc/kubernetes/cloud/openstack.conf` from `kubernetes/master/manifests/kube-controller-manager.yaml`, `kubernetes/master/node.yaml` and `kubernetes/worker/node.yaml`. You could also remove the `write_files` of `/etc/kubernetes/cloud/openstack.conf` from `kubernetes/master/node.yaml` and `kubernetes/worker/node.yaml`. If `openstack.conf.sample`, or another error is in this file, kubernetes refuses to start. If you get an error like `Could not fetch contents for file:///Users/chris/heat-examples/coreos/kubernetes/openstack.conf`, there is some remainig `write_files` in some some yaml.
@@ -8,8 +81,8 @@ This installation expects to have access to OpenStack. You have to move `opensta
 First of all, you need to configure your public_net_id in `01-network-stack-env.yaml`, and setup the network. Also replace the `key name` in all the `*-env.yml`-files, or use `-P key_name=YOUR_KEY` with `heat`.
 
 ```
-$ heat stack-create -f 01-network-stack.yaml -e 01-network-stack-env.yaml kubi
-$ heat stack-list
+$ openstack stack create -t 01-network-stack.yaml -e 01-network-stack-env.yaml kubi
+$ openstack stack list
 +--------------------------------------+------------+-----------------+----------------------+--------------+
 | id                                   | stack_name | stack_status    | creation_time        | updated_time |
 +--------------------------------------+------------+-----------------+----------------------+--------------+
@@ -20,7 +93,7 @@ $ heat stack-list
 Getting the network, subnet_id and floating_ip_id
 
 ```
-$ heat resource-list kubi
+$ openstack stack resource list kubi
 +-----------------------+-------------------------------------------------------------------------------------+------------------------------+-----------------+----------------------+
 | resource_name         | physical_resource_id                                                                | resource_type                | resource_status | updated_time         |
 +-----------------------+-------------------------------------------------------------------------------------+------------------------------+-----------------+----------------------+
@@ -38,8 +111,8 @@ and adjust the values of `network` and `subnet` in `02-etcd-stack-env.yaml`.
 The etcd-cluster is the first real component to create
 
 ```
-$ heat stack-create -f 02-etcd-stack.yaml -e 02-etcd-stack-env.yaml -P discovery_url=(curl "https://discovery.etcd.io/new?size=5") kubi-etcd
-$ nova list
+$ openstack stack create -t 02-etcd-stack.yaml -e 02-etcd-stack-env.yaml --parameter discovery_url=$(curl "https://discovery.etcd.io/new?size=3") kubi-etcd
+$ openstack server list
 +--------------------------------------+-------------+--------+------------+-------------+-----------------------------------+
 | ID                                   | Name        | Status | Task State | Power State | Networks                          |
 +--------------------------------------+-------------+--------+------------+-------------+-----------------------------------+
@@ -69,8 +142,8 @@ Generating RSA private key, 2048 bit long modulus
 Start the kubernetes master:
 
 ```
-$ heat stack-create -f 03-kubernetes-master-stack.yaml -e 03-kubernetes-master-stack-env.yaml kubi-master
-$ nova list
+$ openstack stack create -t 03-kubernetes-master-stack.yaml -e 03-kubernetes-master-stack-env.yaml kubi-master
+$ openstack server list
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
 | ID                                   | Name                           | Status | Task State | Power State | Networks                                        |
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
@@ -154,8 +227,8 @@ kube-scheduler-kubi-master0            1/1       Running   0          1m
 Start the worker nodes
 
 ```
-$ heat stack-create -f 04-kubernetes-worker-stack.yaml  -e 04-kubernetes-worker-stack-env.yaml -P count=10 kubi-worker
-$ nova list
+$ openstack stack create -t 04-kubernetes-worker-stack.yaml  -e 04-kubernetes-worker-stack-env.yaml -P count=10 kubi-worker
+$ openstack server list
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
 | ID                                   | Name                           | Status | Task State | Power State | Networks                                        |
 +--------------------------------------+--------------------------------+--------+------------+-------------+-------------------------------------------------+
