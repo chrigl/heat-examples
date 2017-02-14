@@ -15,8 +15,6 @@ spec:
     - --leader-elect=true 
     - --service-account-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem
     - --root-ca-file=/etc/kubernetes/ssl/ca.pem
-    - --cloud-provider=openstack
-    - --cloud-config=/etc/kubernetes/cloud/openstack.conf
     livenessProbe:
       httpGet:
         host: 127.0.0.1

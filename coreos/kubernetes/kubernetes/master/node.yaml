@@ -244,9 +244,7 @@ resources:
                   --pod-manifest-path=/etc/kubernetes/manifests \
                   --hostname-override=${OS_SERVER_NAME} \
                   --cluster_dns=10.3.0.53 \
-                  --cluster_domain=cluster.local \
-                  --cloud-provider=openstack \
-                  --cloud-config=/etc/kubernetes/cloud/openstack.conf
+                  --cluster_domain=cluster.local
 
                 Restart=always
                 RestartSec=10
